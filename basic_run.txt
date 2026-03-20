@@ -1,0 +1,2441 @@
+====================================================================================================
+LightCycler Protocol Trace - basic_run.pcapng (decoded)
+Host: 192.168.95.42  |  LightCycler: 192.168.95.41
+Total content packets: 248 (330 keepalives removed)
+====================================================================================================
+
+[  43]     12.942s  <<< LC -> HOST  (header=000e0067, 107B)
+              101
+              19.03.2026_11:10:47
+              90
+              11
+               84
+               0
+               Initialisation of Instrument. FilterWheels initialisation done.
+
+[  44]     12.943s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[  46]     12.970s  <<< LC -> HOST  (header=00100052, 86B)
+              101
+              19.03.2026_11:10:48
+              100905081
+              MRCDetectionCameraActivate::OnStart: arm camera
+
+[  47]     12.970s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[  52]     13.059s  <<< LC -> HOST  (header=00100059, 93B)
+              101
+              19.03.2026_11:10:48
+              100905080
+              MRCDetectionCameraActivate::OnAnswer: camera activated
+
+[  53]     13.059s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[  56]     13.060s  <<< LC -> HOST  (header=000e006a, 110B)
+              102
+              19.03.2026_11:10:48
+              90
+              11
+               85
+               0
+               Initialisation of Instrument. WellCoordinates calculation started.
+
+[  57]     13.060s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[  84]     21.979s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:10:57
+              301
+              6
+
+[  85]     21.979s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 109]     27.612s  <<< LC -> HOST  (header=001000af, 179B)
+              101
+              19.03.2026_11:11:02
+              100905050
+              MRCDetectionCalcWellCoordinates::OnAnswer: CoverMarker coordinates:  0_X: 151, 0_Y: 966  1_X: 1200, 1_Y: 53  2_X: 0, 2_Y: 0  3_X: 0, 3_Y: 0 
+
+[ 110]     27.612s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 112]     27.613s  <<< LC -> HOST  (header=001000b4, 184B)
+              102
+              19.03.2026_11:11:02
+              100905051
+              MRCDetectionCalcWellCoordinates::OnAnswer: CoverMarker calc coordinates:  0_X: 151, 0_Y: 966  1_X: 1200, 1_Y: 53  2_X: 0, 2_Y: 0  3_X: 0, 3_Y: 0 
+
+[ 113]     27.613s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 115]     27.614s  <<< LC -> HOST  (header=00100066, 106B)
+              103
+              19.03.2026_11:11:02
+              100905052
+              MRCDetectionCalcWellCoordinates::OnAnswer: Number of iterations: 1 
+
+[ 116]     27.614s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 118]     27.615s  <<< LC -> HOST  (header=000e0067, 107B)
+              104
+              19.03.2026_11:11:02
+              90
+              11
+               86
+               0
+               Initialisation of Instrument. WellCoordinates calculation done.
+
+[ 119]     27.615s  >>> HOST -> LC  (header=000e0003, 7B)
+              104
+
+[ 121]     27.616s  <<< LC -> HOST  (header=000e005e, 98B)
+              105
+              19.03.2026_11:11:02
+              90
+              11
+               87
+               0
+               Initialisation of Instrument. HotPixel search started.
+
+[ 122]     27.616s  >>> HOST -> LC  (header=000e0003, 7B)
+              105
+
+[ 166]     39.604s  <<< LC -> HOST  (header=0010006b, 111B)
+              101
+              19.03.2026_11:11:14
+              100905145
+              MRCDetectionSearchHotPixels::OnAnswer: ImageId: 3, NumberOfHotPixels: 18
+
+[ 167]     39.604s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 169]     39.606s  <<< LC -> HOST  (header=000e005b, 95B)
+              102
+              19.03.2026_11:11:14
+              90
+              11
+               88
+               0
+               Initialisation of Instrument. HotPixel search done.
+
+[ 170]     39.606s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 172]     39.607s  <<< LC -> HOST  (header=000e0064, 104B)
+              103
+              19.03.2026_11:11:14
+              90
+              11
+               89
+               0
+               Initialisation of Instrument. DarkValue measurement started.
+
+[ 173]     39.607s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 206]     48.520s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:11:23
+              301
+              3
+
+[ 207]     48.520s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 209]     48.521s  <<< LC -> HOST  (header=00100055, 89B)
+              102
+              19.03.2026_11:11:23
+              100905091
+              MRCDetectionCameraDeactivate::OnStart: stop camera
+
+[ 210]     48.521s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 212]     48.568s  <<< LC -> HOST  (header=0010005d, 97B)
+              101
+              19.03.2026_11:11:23
+              100905090
+              MRCDetectionCameraDeactivate::OnAnswer: camera deactivated
+
+[ 213]     48.568s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 215]     48.570s  <<< LC -> HOST  (header=000e0055, 89B)
+              102
+              19.03.2026_11:11:23
+              90
+              11
+               90
+               0
+               Initialisation of Instrument. Detection done.
+
+[ 216]     48.570s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 261]     61.260s  <<< LC -> HOST  (header=000e0064, 104B)
+              101
+              19.03.2026_11:11:36
+              90
+              11
+               95
+               0
+               Initialisation of Instrument. RunSequencer, Detection  done.
+
+[ 262]     61.260s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 264]     61.261s  <<< LC -> HOST  (header=0010005c, 96B)
+              102
+              19.03.2026_11:11:36
+              100405050
+              MRCExerunServerInit::OnAnswer: Application init finished.
+
+[ 265]     61.261s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 267]     61.262s  <<< LC -> HOST  (header=000e004f, 83B)
+              103
+              19.03.2026_11:11:36
+              90
+              11
+               100
+               0
+               Initialisation of Instrument finished.
+
+[ 268]     61.262s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 270]     61.263s  <<< LC -> HOST  (header=00100087, 139B)
+              104
+              19.03.2026_11:11:36
+              100405070
+              STCExerunServerInit::OnAnswer: Powerfail has ocurred, change into Cleanup State to clean the system!
+
+[ 271]     61.264s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 273]     61.264s  <<< LC -> HOST  (header=000e001e, 34B)
+              105
+              19.03.2026_11:11:36
+              11
+              5
+
+[ 274]     61.264s  >>> HOST -> LC  (header=000e0003, 7B)
+              105
+
+[ 276]     61.265s  <<< LC -> HOST  (header=000e001e, 34B)
+              106
+              19.03.2026_11:11:36
+              11
+              6
+
+[ 277]     61.265s  >>> HOST -> LC  (header=000e0003, 7B)
+              106
+
+[ 330]     76.774s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:11:51
+              301
+              5
+
+[ 331]     76.774s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 382]     91.755s  <<< LC -> HOST  (header=0010005a, 94B)
+              101
+              19.03.2026_11:12:06
+              101105020
+              MRCLoadingMoveToBarcodeRead::OnAnswer: Barcode read : 
+
+[ 383]     91.755s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 385]     91.756s  <<< LC -> HOST  (header=0010006b, 111B)
+              102
+              19.03.2026_11:12:06
+              101105220
+              MRCLoadingMoveToBarcodeRead::IsMWPCompatible:Detection MWP Type: eMWP384
+
+[ 386]     91.756s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 388]     91.757s  <<< LC -> HOST  (header=000e0021, 37B)
+              103
+              19.03.2026_11:12:06
+              303
+              1 
+
+[ 389]     91.757s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 391]     92.064s  >>> HOST -> LC  (header=047f0001, 5B)
+               
+
+[ 393]     92.065s  <<< LC -> HOST  (header=047f0004, 8B)
+              0
+
+[ 405]     94.563s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:12:09
+              301
+              4
+
+[ 406]     94.563s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 408]     94.564s  <<< LC -> HOST  (header=000e001f, 35B)
+              102
+              19.03.2026_11:12:09
+              11
+              10
+
+[ 409]     94.564s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 441]    103.050s  >>> HOST -> LC  (header=047f0001, 5B)
+               
+
+[ 443]    103.051s  <<< LC -> HOST  (header=047f0004, 8B)
+              0
+
+[ 449]    103.347s  >>> HOST -> LC  (header=04b00002, 6B)
+              15
+
+[ 451]    103.348s  <<< LC -> HOST  (header=04b00002, 6B)
+              0
+
+[ 457]    104.396s  >>> HOST -> LC  (header=00330001, 5B)
+               
+
+[ 459]    104.500s  <<< LC -> HOST  (header=00330086, 138B)
+              248671
+              1495261
+              293098
+              67
+              58
+              4064
+              4057
+              1
+              20
+              0
+              45
+              16946
+              8250
+              2277
+              51
+              555043
+              6
+              6674
+              6477
+              2500
+              0
+              1625644356
+              1065064231
+              1129670778
+              1200000
+
+[ 513]    120.349s  >>> HOST -> LC  (header=00330001, 5B)
+               
+
+[ 515]    120.452s  <<< LC -> HOST  (header=00330086, 138B)
+              248671
+              1495261
+              293098
+              67
+              58
+              4064
+              4057
+              1
+              20
+              0
+              45
+              16946
+              8250
+              2277
+              51
+              555043
+              6
+              6674
+              6477
+              2500
+              0
+              1625644356
+              1065064231
+              1129670778
+              1200000
+
+[ 517]    120.613s  >>> HOST -> LC  (header=012d002c, 48B)
+              1
+              DC69630C99DE498AA727688B310ABCCF
+              384
+              20
+              1
+
+[ 519]    120.615s  <<< LC -> HOST  (header=012d0006, 10B)
+              0
+              1
+              0
+
+[ 520]    120.615s  >>> HOST -> LC  (header=012f000e, 18B)
+              2
+              1
+              1
+              0
+              1
+              1
+              3
+
+[ 522]    120.616s  <<< LC -> HOST  (header=012f0006, 10B)
+              0
+              2
+              0
+
+[ 523]    120.616s  >>> HOST -> LC  (header=01310017, 27B)
+              3
+              1
+              1
+              0
+              3000
+              1
+              2
+              1
+              100
+
+[ 525]    120.618s  <<< LC -> HOST  (header=01310006, 10B)
+              0
+              3
+              0
+
+[ 526]    120.618s  >>> HOST -> LC  (header=0132001e, 34B)
+              4
+              1
+              1
+              3700
+              1
+              4800
+              500
+              0
+              0
+              0
+              1
+
+[ 528]    120.619s  <<< LC -> HOST  (header=01320006, 10B)
+              0
+              4
+              0
+
+[ 529]    120.619s  >>> HOST -> LC  (header=0132001e, 34B)
+              5
+              1
+              2
+              3700
+              1
+              4800
+              500
+              0
+              0
+              0
+              1
+
+[ 531]    120.621s  <<< LC -> HOST  (header=01320006, 10B)
+              0
+              5
+              0
+
+[ 532]    120.621s  >>> HOST -> LC  (header=0132001e, 34B)
+              6
+              1
+              3
+              3700
+              1
+              4800
+              500
+              0
+              0
+              0
+              1
+
+[ 534]    120.622s  <<< LC -> HOST  (header=01320006, 10B)
+              0
+              6
+              0
+
+[ 535]    120.622s  >>> HOST -> LC  (header=01300003, 7B)
+              7
+              ?
+
+[ 537]    120.624s  <<< LC -> HOST  (header=01300006, 10B)
+              0
+              7
+              0
+
+[ 538]    120.624s  >>> HOST -> LC  (header=012e0003, 7B)
+              8
+              ?
+
+[ 540]    120.625s  <<< LC -> HOST  (header=012e0006, 10B)
+              0
+              8
+              0
+
+[ 541]    120.625s  >>> HOST -> LC  (header=00c90003, 7B)
+              9
+              ?
+
+[ 543]    120.656s  <<< LC -> HOST  (header=00c90008, 12B)
+              0
+              9
+              0
+              1
+
+[ 544]    120.671s  <<< LC -> HOST  (header=000e001e, 34B)
+              101
+              19.03.2026_11:12:35
+              11
+              7
+
+[ 545]    120.671s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 547]    120.672s  <<< LC -> HOST  (header=00100063, 103B)
+              102
+              19.03.2026_11:12:35
+              100705010
+              MRCRunSequencerExecuteRun::OnStart: TickBackup has been stopped.
+
+[ 548]    120.672s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 550]    120.673s  <<< LC -> HOST  (header=000e0066, 106B)
+              103
+              19.03.2026_11:12:35
+              90
+              12
+               0
+               0
+               Instrument Warm Up. This may take several minutes.
+              Please wait.
+
+[ 551]    120.673s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 553]    120.674s  <<< LC -> HOST  (header=0010007e, 130B)
+              104
+              19.03.2026_11:12:35
+              100905160
+              Set Radius in RawdataReduction controller: Block Type 2, Plate Type 0, Volume 20, Radius 12
+
+[ 554]    120.674s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 556]    120.693s  <<< LC -> HOST  (header=00100044, 72B)
+              101
+              19.03.2026_11:12:35
+              100905120
+              Initiate LampIntensity measuring!
+
+[ 557]    120.694s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 572]    124.197s  <<< LC -> HOST  (header=0010005c, 96B)
+              101
+              19.03.2026_11:12:39
+              100905130
+              Origin Lamp Intensity: 6674  Current Lamp Intensity: 6381
+
+[ 573]    124.197s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 591]    129.597s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:12:44
+              301
+              6
+
+[ 592]    129.597s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 594]    129.598s  <<< LC -> HOST  (header=000e0045, 73B)
+              102
+              19.03.2026_11:12:44
+              90
+              12
+               100
+               0
+               Instrument Warm Up finished.
+
+[ 595]    129.598s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 597]    129.599s  <<< LC -> HOST  (header=00100052, 86B)
+              103
+              19.03.2026_11:12:44
+              100905081
+              MRCDetectionCameraActivate::OnStart: arm camera
+
+[ 598]    129.599s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 600]    129.694s  <<< LC -> HOST  (header=00100059, 93B)
+              101
+              19.03.2026_11:12:44
+              100905080
+              MRCDetectionCameraActivate::OnAnswer: camera activated
+
+[ 601]    129.694s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 603]    129.695s  <<< LC -> HOST  (header=000e001d, 33B)
+              102
+              19.03.2026_11:12:44
+              104
+
+[ 604]    129.695s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 615]    131.628s  <<< LC -> HOST  (header=000e004f, 83B)
+              101
+              19.03.2026_11:12:46
+              202
+              5 280 1969 690 2016 1100 2178 1520 2408 1930 2662
+
+[ 616]    131.628s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 626]    133.690s  <<< LC -> HOST  (header=000e0051, 85B)
+              101
+              19.03.2026_11:12:48
+              202
+              5 2340 2901 2750 3170 3170 3361 3580 3554 3990 3751
+
+[ 627]    133.690s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 636]    135.341s  <<< LC -> HOST  (header=00100038, 60B)
+              101
+              19.03.2026_11:12:50
+              100905030
+              Acquisition prepared!
+
+[ 637]    135.341s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 639]    135.342s  <<< LC -> HOST  (header=0010002f, 51B)
+              102
+              19.03.2026_11:12:50
+              100905010
+              Perform Acq!
+
+[ 640]    135.342s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 642]    135.622s  <<< LC -> HOST  (header=0010006d, 113B)
+              101
+              19.03.2026_11:12:50
+              100905020
+              Acq performed! RefChannelValue sent from RawataReduction controller: 12753
+
+[ 643]    135.622s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 645]    135.766s  <<< LC -> HOST  (header=000e0051, 85B)
+              101
+              19.03.2026_11:12:50
+              202
+              5 4400 3879 4820 3921 5230 3911 5640 3875 6070 3815
+
+[ 646]    135.766s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 648]    136.059s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:12:51
+              100905170
+              MRCResultReadResult::OnAnswer(): Average bias value received: 515
+
+[ 649]    136.059s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 651]    136.060s  <<< LC -> HOST  (header=0010007f, 131B)
+              102
+              19.03.2026_11:12:51
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 2, expected: 1, ImageId: 5
+
+[ 652]    136.060s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 654]    136.061s  <<< LC -> HOST  (header=0010007f, 131B)
+              103
+              19.03.2026_11:12:51
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 1, expected: 2, ImageId: 5
+
+[ 655]    136.061s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 664]    137.784s  <<< LC -> HOST  (header=00100038, 60B)
+              101
+              19.03.2026_11:12:52
+              100905030
+              Acquisition prepared!
+
+[ 665]    137.784s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 667]    137.785s  <<< LC -> HOST  (header=0010002f, 51B)
+              102
+              19.03.2026_11:12:52
+              100905010
+              Perform Acq!
+
+[ 668]    137.785s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 670]    137.829s  <<< LC -> HOST  (header=000e0051, 85B)
+              101
+              19.03.2026_11:12:52
+              202
+              5 6480 3774 6890 3732 7300 3708 7720 3698 8130 3698
+
+[ 671]    137.829s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 677]    138.348s  <<< LC -> HOST  (header=0010006d, 113B)
+              101
+              19.03.2026_11:12:53
+              100905020
+              Acq performed! RefChannelValue sent from RawataReduction controller: 12762
+
+[ 678]    138.348s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 680]    138.793s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:12:53
+              100905170
+              MRCResultReadResult::OnAnswer(): Average bias value received: 525
+
+[ 681]    138.793s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 683]    138.794s  <<< LC -> HOST  (header=0010007f, 131B)
+              102
+              19.03.2026_11:12:53
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 2, expected: 1, ImageId: 6
+
+[ 684]    138.794s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 686]    138.795s  <<< LC -> HOST  (header=0010007f, 131B)
+              103
+              19.03.2026_11:12:53
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 3, expected: 2, ImageId: 6
+
+[ 687]    138.795s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 689]    138.796s  <<< LC -> HOST  (header=0010007f, 131B)
+              104
+              19.03.2026_11:12:53
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 1, expected: 3, ImageId: 6
+
+[ 690]    138.796s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 696]    139.893s  <<< LC -> HOST  (header=000e0052, 86B)
+              101
+              19.03.2026_11:12:54
+              202
+              5 8540 3698 8950 3703 9370 3707 9780 3707 10190 3707
+
+[ 697]    139.893s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 703]    140.523s  <<< LC -> HOST  (header=00100038, 60B)
+              101
+              19.03.2026_11:12:55
+              100905030
+              Acquisition prepared!
+
+[ 704]    140.523s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 706]    140.524s  <<< LC -> HOST  (header=0010002f, 51B)
+              102
+              19.03.2026_11:12:55
+              100905010
+              Perform Acq!
+
+[ 707]    140.524s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 709]    141.101s  <<< LC -> HOST  (header=0010006d, 113B)
+              101
+              19.03.2026_11:12:56
+              100905020
+              Acq performed! RefChannelValue sent from RawataReduction controller: 12765
+
+[ 710]    141.101s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 712]    141.102s  <<< LC -> HOST  (header=000e0023, 39B)
+              102
+              19.03.2026_11:12:56
+              103
+              1 1 1
+
+[ 713]    141.102s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 719]    141.532s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:12:56
+              100905170
+              MRCResultReadResult::OnAnswer(): Average bias value received: 525
+
+[ 720]    141.532s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 722]    141.533s  <<< LC -> HOST  (header=0010007f, 131B)
+              102
+              19.03.2026_11:12:56
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 3, expected: 2, ImageId: 7
+
+[ 723]    141.533s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 725]    141.534s  <<< LC -> HOST  (header=0010007f, 131B)
+              103
+              19.03.2026_11:12:56
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 2, expected: 3, ImageId: 7
+
+[ 726]    141.534s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 728]    141.535s  <<< LC -> HOST  (header=000e0027, 43B)
+              104
+              19.03.2026_11:12:56
+              201
+              384 1 1 1
+
+[ 729]    141.535s  >>> HOST -> LC  (header=000e0003, 7B)
+              104
+
+[ 731]    141.571s  >>> HOST -> LC  (header=044d0002, 6B)
+              1
+
+[ 733]    141.577s  <<< LC -> HOST  (header=044d04d4, 1240B)
+              0
+              1
+              2
+              1
+              DC69630C99DE498AA727688B310ABCCF
+              1
+              1
+              1
+              10820
+              3708
+              389949
+              12765
+              0
+              384
+              72
+              33
+              60
+              56
+              56
+              29
+              35
+              33
+              33
+              46
+              42
+              44
+              38
+              30
+              41
+              41
+              60
+              45
+              105
+              40
+              32
+              42
+              55
+              58
+              105
+              50
+              36
+              55
+              42
+              32
+              43
+              40
+              28
+              35
+              35
+              35
+              37
+              33
+              37
+              63
+              49
+              33
+              37
+              28
+              56
+              53
+              46
+              59
+              49
+              49
+              35
+              42
+              28
+              28
+              52
+              61
+              26
+              30
+              27
+              45
+              28
+              31
+              31
+              35
+              38
+              28
+              38
+              32
+              36
+              38
+              39
+              45
+              68
+              99
+              35
+              26
+              41
+              33
+              62
+              34
+              37
+              32
+              36
+              34
+              28
+              27
+              26
+              28
+              42
+              39
+              30
+              40
+              48
+              46
+              52
+              56
+              69
+              41
+              38
+              22
+              23
+              21
+              29
+              23
+              23
+              27
+              26
+              32
+              35
+              24
+              24
+              24
+              35
+              26
+              26
+              27
+              31
+              30
+              47
+              51
+              36
+              35
+              32
+              26
+              36
+              30
+              26
+              28
+              30
+              37
+              26
+              38
+              40
+              25
+              34
+              28
+              26
+              29
+              27
+              33
+              54
+              38
+              38
+              61
+              43
+              54
+              30
+              39
+              34
+              54
+              46
+              29
+              36
+              29
+              26
+              48
+              35
+              28
+              23
+              32
+              24
+              27
+              30
+              24
+              42
+              44
+              39
+              52
+              33
+              48
+              37
+              32
+              36
+              31
+              28
+              44
+              30
+              26
+              29
+              37
+              27
+              39
+              29
+              22
+              25
+              26
+              28
+              31
+              30
+              31
+              52
+              64
+              43
+              29
+              41
+              39
+              35
+              30
+              32
+              30
+              24
+              27
+              24
+              26
+              25
+              29
+              27
+              31
+              31
+              32
+              31
+              32
+              28
+              41
+              65
+              72
+              50
+              50
+              37
+              38
+              38
+              30
+              30
+              27
+              89
+              29
+              52
+              34
+              36
+              36
+              36
+              31
+              41
+              38
+              69
+              35
+              38
+              61
+              50
+              98
+              208
+              67
+              34
+              43
+              35
+              36
+              46
+              28
+              43
+              40
+              40
+              30
+              34
+              27
+              32
+              39
+              35
+              27
+              38
+              30
+              72
+              63
+              34
+              62
+              48
+              64
+              50
+              35
+              39
+              688
+              47
+              31
+              63
+              39
+              30
+              33
+              32
+              39
+              34
+              34
+              41
+              30
+              30
+              28
+              36
+              48
+              38
+              74
+              66
+              47
+              41
+              38
+              46
+              32
+              41
+              44
+              47
+              42
+              27
+              42
+              28
+              40
+              37
+              36
+              31
+              28
+              43
+              34
+              28
+              249
+              46
+              89
+              56
+              50
+              40
+              46
+              36
+              41
+              60
+              45
+              34
+              37
+              37
+              46
+              34
+              37
+              38
+              35
+              43
+              41
+              45
+              27
+              32
+              40
+              49
+              61
+              41
+              37
+              67
+              317
+              75
+              48
+              60
+              44
+              53
+              40
+              44
+              37
+              33
+              46
+              46
+              45
+              49
+              31
+              40
+              31
+              33
+              52
+              53
+              65
+              47
+              92
+              46
+              39
+              36
+              42
+              31
+              46
+              53
+              35
+              51
+              84
+              46
+              58
+              42
+              49
+              31
+              34
+              39
+              44
+              41
+              48
+              108
+              60
+
+[ 734]    141.582s  >>> HOST -> LC  (header=044f0001, 5B)
+               
+
+[ 736]    141.583s  <<< LC -> HOST  (header=044f000a, 14B)
+              0
+              1
+              1
+              384
+
+[ 737]    141.583s  >>> HOST -> LC  (header=044e0001, 5B)
+              1
+
+[ 739]    141.584s  <<< LC -> HOST  (header=044e0002, 6B)
+              0
+
+[ 741]    141.954s  <<< LC -> HOST  (header=000e0056, 90B)
+              101
+              19.03.2026_11:12:57
+              202
+              5 10600 3707 11010 3708 11440 3707 11840 3702 12250 3702
+
+[ 742]    141.955s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 751]    143.934s  <<< LC -> HOST  (header=00100038, 60B)
+              101
+              19.03.2026_11:12:58
+              100905030
+              Acquisition prepared!
+
+[ 752]    143.934s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 754]    143.935s  <<< LC -> HOST  (header=0010002f, 51B)
+              102
+              19.03.2026_11:12:58
+              100905010
+              Perform Acq!
+
+[ 755]    143.935s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 757]    144.018s  <<< LC -> HOST  (header=000e0056, 90B)
+              101
+              19.03.2026_11:12:59
+              202
+              5 12670 3702 13080 3702 13490 3702 13900 3697 14320 3697
+
+[ 758]    144.018s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 764]    144.510s  <<< LC -> HOST  (header=0010006d, 113B)
+              101
+              19.03.2026_11:12:59
+              100905020
+              Acq performed! RefChannelValue sent from RawataReduction controller: 12766
+
+[ 765]    144.510s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 767]    144.511s  <<< LC -> HOST  (header=000e0023, 39B)
+              102
+              19.03.2026_11:12:59
+              103
+              1 1 2
+
+[ 768]    144.511s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 771]    144.952s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:12:59
+              100905170
+              MRCResultReadResult::OnAnswer(): Average bias value received: 525
+
+[ 772]    144.952s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 774]    144.953s  <<< LC -> HOST  (header=0010007f, 131B)
+              102
+              19.03.2026_11:12:59
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 2, expected: 1, ImageId: 8
+
+[ 775]    144.953s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 777]    144.954s  <<< LC -> HOST  (header=0010007f, 131B)
+              103
+              19.03.2026_11:12:59
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 3, expected: 2, ImageId: 8
+
+[ 778]    144.954s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 780]    144.955s  <<< LC -> HOST  (header=0010007f, 131B)
+              104
+              19.03.2026_11:12:59
+              100905170
+              MRCResultReadResult::OnAnswer Order not respected, read BlockId: 1, expected: 3, ImageId: 8
+
+[ 781]    144.955s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 783]    144.956s  <<< LC -> HOST  (header=000e0027, 43B)
+              105
+              19.03.2026_11:13:00
+              201
+              384 1 2 2
+
+[ 784]    144.956s  >>> HOST -> LC  (header=000e0003, 7B)
+              105
+
+[ 786]    145.000s  >>> HOST -> LC  (header=044d0002, 6B)
+              2
+
+[ 788]    145.006s  <<< LC -> HOST  (header=044d04d5, 1241B)
+              0
+              1
+              2
+              1
+              DC69630C99DE498AA727688B310ABCCF
+              1
+              1
+              2
+              14230
+              3697
+              389949
+              12766
+              0
+              384
+              71
+              33
+              60
+              55
+              53
+              28
+              34
+              33
+              32
+              45
+              39
+              44
+              38
+              29
+              40
+              41
+              61
+              46
+              106
+              38
+              33
+              40
+              56
+              57
+              106
+              49
+              34
+              55
+              41
+              32
+              42
+              40
+              27
+              35
+              35
+              35
+              36
+              33
+              37
+              62
+              49
+              34
+              36
+              24
+              55
+              54
+              45
+              57
+              46
+              49
+              37
+              42
+              29
+              29
+              52
+              61
+              25
+              32
+              28
+              45
+              30
+              32
+              33
+              37
+              38
+              29
+              38
+              32
+              38
+              40
+              40
+              45
+              68
+              100
+              36
+              25
+              39
+              32
+              61
+              33
+              36
+              31
+              35
+              31
+              28
+              27
+              25
+              27
+              41
+              37
+              28
+              39
+              45
+              44
+              52
+              56
+              68
+              39
+              39
+              23
+              24
+              22
+              29
+              23
+              23
+              25
+              26
+              31
+              34
+              24
+              23
+              25
+              34
+              25
+              26
+              29
+              31
+              29
+              46
+              48
+              38
+              37
+              31
+              26
+              36
+              31
+              25
+              28
+              29
+              38
+              26
+              38
+              39
+              26
+              34
+              27
+              26
+              29
+              27
+              31
+              56
+              37
+              38
+              59
+              42
+              55
+              31
+              39
+              32
+              53
+              44
+              29
+              37
+              29
+              26
+              47
+              36
+              30
+              24
+              32
+              22
+              28
+              30
+              24
+              40
+              44
+              39
+              51
+              32
+              47
+              37
+              30
+              34
+              32
+              28
+              45
+              29
+              28
+              29
+              36
+              26
+              38
+              27
+              23
+              25
+              23
+              28
+              31
+              29
+              30
+              52
+              64
+              41
+              30
+              40
+              39
+              32
+              29
+              30
+              28
+              22
+              25
+              22
+              25
+              24
+              26
+              25
+              29
+              30
+              29
+              30
+              31
+              27
+              39
+              65
+              73
+              51
+              49
+              38
+              37
+              37
+              30
+              30
+              26
+              90
+              31
+              52
+              33
+              35
+              37
+              34
+              30
+              39
+              37
+              66
+              35
+              37
+              60
+              49
+              97
+              208
+              67
+              33
+              43
+              33
+              34
+              44
+              28
+              46
+              38
+              39
+              28
+              33
+              27
+              31
+              41
+              36
+              26
+              38
+              29
+              73
+              62
+              33
+              61
+              47
+              62
+              48
+              35
+              38
+              686
+              47
+              30
+              60
+              41
+              28
+              33
+              31
+              39
+              34
+              35
+              40
+              29
+              29
+              27
+              36
+              46
+              37
+              71
+              66
+              47
+              41
+              36
+              45
+              30
+              40
+              42
+              46
+              41
+              27
+              42
+              28
+              40
+              37
+              35
+              31
+              27
+              43
+              33
+              28
+              253
+              45
+              89
+              56
+              51
+              38
+              42
+              34
+              39
+              60
+              43
+              33
+              35
+              37
+              44
+              31
+              36
+              37
+              35
+              42
+              39
+              42
+              25
+              31
+              39
+              45
+              58
+              39
+              36
+              67
+              317
+              76
+              47
+              60
+              43
+              51
+              39
+              45
+              36
+              32
+              48
+              46
+              44
+              47
+              31
+              39
+              31
+              32
+              52
+              54
+              64
+              48
+              93
+              46
+              38
+              38
+              43
+              30
+              45
+              52
+              35
+              53
+              86
+              47
+              60
+              43
+              48
+              34
+              34
+              39
+              44
+              42
+              48
+              109
+              60
+
+[ 789]    145.011s  >>> HOST -> LC  (header=044f0001, 5B)
+               
+
+[ 791]    145.012s  <<< LC -> HOST  (header=044f000a, 14B)
+              0
+              1
+              2
+              384
+
+[ 792]    145.012s  >>> HOST -> LC  (header=044e0001, 5B)
+              2
+
+[ 794]    145.013s  <<< LC -> HOST  (header=044e0002, 6B)
+              0
+
+[ 801]    146.078s  <<< LC -> HOST  (header=000e0056, 90B)
+              101
+              19.03.2026_11:13:01
+              202
+              5 14730 3702 15140 3697 15560 3702 15970 3697 16380 3697
+
+[ 802]    146.078s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 812]    147.339s  <<< LC -> HOST  (header=00100038, 60B)
+              101
+              19.03.2026_11:13:02
+              100905030
+              Acquisition prepared!
+
+[ 813]    147.339s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 815]    147.340s  <<< LC -> HOST  (header=0010002f, 51B)
+              102
+              19.03.2026_11:13:02
+              100905010
+              Perform Acq!
+
+[ 816]    147.340s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 818]    147.913s  <<< LC -> HOST  (header=0010006d, 113B)
+              101
+              19.03.2026_11:13:02
+              100905020
+              Acq performed! RefChannelValue sent from RawataReduction controller: 12767
+
+[ 819]    147.914s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 821]    147.914s  <<< LC -> HOST  (header=000e0023, 39B)
+              102
+              19.03.2026_11:13:02
+              103
+              1 1 3
+
+[ 822]    147.915s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 824]    147.915s  <<< LC -> HOST  (header=000e0023, 39B)
+              103
+              19.03.2026_11:13:02
+              102
+              1 1 3
+
+[ 825]    147.915s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 827]    147.916s  <<< LC -> HOST  (header=000e001d, 33B)
+              104
+              19.03.2026_11:13:02
+              105
+
+[ 828]    147.916s  >>> HOST -> LC  (header=000e0003, 7B)
+              104
+
+[ 830]    148.142s  <<< LC -> HOST  (header=000e0056, 90B)
+              101
+              19.03.2026_11:13:03
+              202
+              5 16790 3702 17200 3702 17620 3697 18030 3697 18440 3697
+
+[ 831]    148.142s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 837]    148.316s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:13:03
+              100905170
+              MRCResultReadResult::OnAnswer(): Average bias value received: 524
+
+[ 838]    148.316s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 840]    148.317s  <<< LC -> HOST  (header=000e0027, 43B)
+              102
+              19.03.2026_11:13:03
+              201
+              384 1 3 3
+
+[ 841]    148.317s  >>> HOST -> LC  (header=000e0003, 7B)
+              102
+
+[ 843]    148.336s  >>> HOST -> LC  (header=044d0002, 6B)
+              3
+
+[ 845]    148.342s  <<< LC -> HOST  (header=044d04d5, 1241B)
+              0
+              1
+              2
+              1
+              DC69630C99DE498AA727688B310ABCCF
+              1
+              1
+              3
+              17640
+              3697
+              389949
+              12767
+              0
+              384
+              71
+              33
+              61
+              56
+              54
+              30
+              36
+              33
+              32
+              46
+              41
+              44
+              38
+              32
+              41
+              42
+              61
+              44
+              104
+              39
+              32
+              42
+              57
+              59
+              107
+              51
+              37
+              56
+              44
+              34
+              44
+              42
+              28
+              37
+              36
+              36
+              38
+              34
+              37
+              64
+              50
+              35
+              37
+              28
+              56
+              54
+              46
+              58
+              50
+              50
+              36
+              44
+              29
+              29
+              55
+              63
+              27
+              31
+              28
+              47
+              29
+              33
+              33
+              38
+              39
+              30
+              40
+              34
+              38
+              41
+              42
+              47
+              67
+              100
+              36
+              25
+              38
+              33
+              62
+              33
+              38
+              32
+              36
+              33
+              28
+              28
+              27
+              28
+              43
+              38
+              31
+              40
+              46
+              45
+              51
+              56
+              72
+              42
+              40
+              23
+              25
+              23
+              29
+              25
+              24
+              28
+              27
+              33
+              35
+              26
+              23
+              25
+              35
+              27
+              28
+              30
+              33
+              31
+              49
+              51
+              37
+              38
+              31
+              26
+              37
+              32
+              25
+              30
+              31
+              36
+              27
+              40
+              39
+              27
+              34
+              28
+              27
+              31
+              28
+              32
+              56
+              36
+              37
+              61
+              42
+              54
+              33
+              40
+              33
+              54
+              47
+              29
+              36
+              29
+              27
+              48
+              38
+              31
+              25
+              34
+              25
+              29
+              31
+              28
+              42
+              45
+              40
+              50
+              34
+              47
+              37
+              31
+              36
+              33
+              29
+              45
+              29
+              26
+              30
+              35
+              26
+              39
+              28
+              23
+              25
+              26
+              29
+              32
+              29
+              30
+              51
+              65
+              43
+              29
+              41
+              40
+              35
+              32
+              33
+              30
+              26
+              27
+              25
+              26
+              25
+              29
+              26
+              30
+              32
+              31
+              30
+              33
+              26
+              40
+              66
+              74
+              51
+              49
+              38
+              37
+              38
+              32
+              29
+              26
+              89
+              31
+              52
+              33
+              34
+              36
+              33
+              29
+              39
+              37
+              67
+              34
+              38
+              61
+              49
+              97
+              208
+              67
+              36
+              45
+              34
+              36
+              46
+              29
+              47
+              39
+              39
+              29
+              34
+              27
+              31
+              43
+              36
+              27
+              38
+              30
+              72
+              60
+              34
+              61
+              48
+              65
+              50
+              35
+              41
+              692
+              49
+              33
+              62
+              41
+              31
+              34
+              32
+              40
+              36
+              36
+              42
+              29
+              30
+              29
+              36
+              51
+              41
+              75
+              69
+              48
+              42
+              39
+              49
+              33
+              42
+              44
+              48
+              44
+              29
+              45
+              30
+              41
+              38
+              38
+              32
+              28
+              44
+              35
+              30
+              253
+              46
+              89
+              59
+              52
+              40
+              45
+              37
+              41
+              59
+              46
+              34
+              38
+              39
+              47
+              34
+              39
+              41
+              39
+              45
+              41
+              46
+              29
+              33
+              41
+              50
+              63
+              40
+              36
+              67
+              319
+              75
+              47
+              62
+              44
+              51
+              40
+              45
+              36
+              33
+              46
+              48
+              43
+              48
+              31
+              39
+              31
+              33
+              51
+              55
+              64
+              48
+              96
+              49
+              40
+              38
+              42
+              33
+              46
+              55
+              37
+              54
+              85
+              46
+              59
+              41
+              49
+              34
+              35
+              39
+              45
+              43
+              48
+              111
+              61
+
+[ 846]    148.346s  >>> HOST -> LC  (header=044f0001, 5B)
+               
+
+[ 848]    148.347s  <<< LC -> HOST  (header=044f000a, 14B)
+              0
+              1
+              3
+              384
+
+[ 849]    148.347s  >>> HOST -> LC  (header=044e0001, 5B)
+              3
+
+[ 851]    148.348s  <<< LC -> HOST  (header=044e0002, 6B)
+              0
+
+[ 853]    148.786s  <<< LC -> HOST  (header=00100060, 100B)
+              101
+              19.03.2026_11:13:03
+              100905229
+              MRCDetectionCheckImageBuffer::OnStart: Start CheckImageBuffer
+
+[ 854]    148.786s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 856]    148.834s  <<< LC -> HOST  (header=00100064, 104B)
+              101
+              19.03.2026_11:13:03
+              100905230
+              MRCDetectionCheckImageBuffer::OnAnswer: 0 images in camera buffer
+
+[ 857]    148.834s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 859]    148.835s  <<< LC -> HOST  (header=0010005b, 95B)
+              102
+              19.03.2026_11:13:03
+              100705030
+              MRCRunSequencerFinishRun::OnAnswer: Number of images = 0
+
+[ 860]    148.835s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 862]    148.836s  <<< LC -> HOST  (header=00100078, 124B)
+              103
+              19.03.2026_11:13:03
+              100705040
+              MRCRunSequencerFinishRun::OnAnswer: Terminated regularly - DACRunSequencer::eRegulary
+
+[ 863]    148.836s  >>> HOST -> LC  (header=00100003, 7B)
+              103
+
+[ 865]    148.837s  <<< LC -> HOST  (header=00100055, 89B)
+              104
+              19.03.2026_11:13:03
+              100905091
+              MRCDetectionCameraDeactivate::OnStart: stop camera
+
+[ 866]    148.837s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 868]    148.879s  <<< LC -> HOST  (header=0010005d, 97B)
+              101
+              19.03.2026_11:13:03
+              100905090
+              MRCDetectionCameraDeactivate::OnAnswer: camera deactivated
+
+[ 869]    148.879s  >>> HOST -> LC  (header=00100003, 7B)
+              101
+
+[ 903]    158.378s  <<< LC -> HOST  (header=000e001f, 35B)
+              101
+              19.03.2026_11:13:12
+              301
+              4
+
+[ 904]    158.379s  >>> HOST -> LC  (header=000e0003, 7B)
+              101
+
+[ 906]    158.380s  <<< LC -> HOST  (header=00100065, 105B)
+              102
+              19.03.2026_11:13:12
+              100705020
+              MRCRunSequencerFinishRun::OnAnswer: TickBackup has been restarted.
+
+[ 907]    158.380s  >>> HOST -> LC  (header=00100003, 7B)
+              102
+
+[ 909]    158.380s  <<< LC -> HOST  (header=000e001f, 35B)
+              103
+              19.03.2026_11:13:12
+              101
+              0
+
+[ 910]    158.380s  >>> HOST -> LC  (header=000e0003, 7B)
+              103
+
+[ 912]    158.381s  <<< LC -> HOST  (header=00100069, 109B)
+              104
+              19.03.2026_11:13:12
+              100405060
+              MRCExerunServerWaitExperimentEnd::OnAnswer: End of Run and Experiment.
+
+[ 913]    158.381s  >>> HOST -> LC  (header=00100003, 7B)
+              104
+
+[ 915]    158.382s  <<< LC -> HOST  (header=000e001f, 35B)
+              105
+              19.03.2026_11:13:12
+              11
+              10
+
+[ 916]    158.382s  >>> HOST -> LC  (header=000e0003, 7B)
+              105
+
+[ 919]    158.978s  >>> HOST -> LC  (header=00330001, 5B)
+               
+
+[ 921]    159.074s  <<< LC -> HOST  (header=00330086, 138B)
+              248672
+              1495261
+              293099
+              67
+              58
+              4065
+              4058
+              1
+              20
+              0
+              45
+              16946
+              8252
+              2277
+              51
+              555046
+              6
+              6674
+              6381
+              2500
+              0
+              1625644356
+              1065064231
+              1129670778
+              1200000
+
+[ 928]    160.295s  >>> HOST -> LC  (header=00330001, 5B)
+               
+
+[ 933]    160.399s  <<< LC -> HOST  (header=00330086, 138B)
+              248672
+              1495261
+              293099
+              67
+              58
+              4065
+              4058
+              1
+              20
+              0
+              45
+              16946
+              8252
+              2277
+              51
+              555046
+              6
+              6674
+              6381
+              2500
+              0
+              1625644356
+              1065064231
+              1129670778
+              1200000
+
+[ 937]    161.005s  >>> HOST -> LC  (header=04b00002, 6B)
+              15
+
+[ 939]    161.006s  <<< LC -> HOST  (header=04b00002, 6B)
+              0

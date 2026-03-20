@@ -1,0 +1,7 @@
+- initialize qPCR machine
+- execute experiment with following parameters:
+ - 37c for 1s, then measure sybr green fluor
+ - 37c for 1s, then measure sybr green fluor
+ - 37c for 1s, then measure sybr green fluor
+  (# done three times for normalization)
+- complete

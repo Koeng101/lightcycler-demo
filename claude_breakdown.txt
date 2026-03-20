@@ -1,0 +1,398 @@
+# LightCycler Network Protocol Reference
+
+Reverse-engineered from `basic_run.pcapng` — a single instrument run captured 2026-03-19.
+
+**Machines:** Host (192.168.95.42) ↔ LightCycler (192.168.95.41)
+
+---
+
+## Wire Format
+
+Every message follows the same framing:
+
+```
+┌──────────────┬──────────────┬─────────────────────┐
+│ Type (2B BE) │ Length (2B BE)│ Payload (UTF-8 text) │
+└──────────────┴──────────────┴─────────────────────┘
+```
+
+- **Type**: Big-endian uint16 — identifies the command/channel.
+- **Length**: Big-endian uint16 — exact byte count of the payload that follows.
+- **Payload**: Newline-delimited (`\n`) ASCII text fields. No binary data observed in payloads.
+
+---
+
+## Keepalive / Heartbeat
+
+Exchanged every ~1 second continuously throughout the connection:
+
+| Direction | Type | Payload | Purpose |
+|-----------|------|---------|---------|
+| HOST → LC | `0x0000` | `hi` | Heartbeat ping |
+| LC → HOST | `0x0000` | `Connection` | Heartbeat response |
+
+These account for ~57% of all packets (330 of 578).
+
+---
+
+## Message Types
+
+### 0x000E — Status / Progress Notifications
+
+The primary status channel. LC sends structured status updates; HOST echoes the sequence number as ACK.
+
+**LC → HOST format:**
+```
+<seq_number>
+<timestamp DD.MM.YYYY_HH:MM:SS>
+<status_code>
+<...status-specific fields...>
+```
+
+**HOST → LC ACK format:**
+```
+<seq_number>
+```
+
+**Known status codes within 0x000E:**
+
+| Code | Meaning | Additional Fields |
+|------|---------|-------------------|
+| `90` | Initialization progress | `<state_id>\n <step_num>\n <pct_or_code>\n <human_readable_message>` |
+| `11` | State change | Single value (observed: 5, 6, 7, 10) — likely instrument state enum |
+| `101` | Run status / completion | Single value (e.g. `0` = success) |
+| `103` | Cycle complete | `<program> <step> <cycle>` (e.g. `1 1 2` = program 1, step 1, cycle 2) |
+| `104` | Temperature setpoint reached | Single value or empty |
+| `105` | Temperature setpoint reached | (appears during post-acquisition) |
+| `201` | Acquisition complete | `<wells> <program> <step> <cycle>` (e.g. `384 1 3 3`) |
+| `202` | Thermal profile data | `<count> <time1> <temp1> <time2> <temp2> ...` (see Thermal Data below) |
+| `301` | Phase/state transition | Single int: 3=detection done, 4=loading/idle, 5=warmup/waiting, 6=ready/acq |
+| `303` | Plate detection result | `1 ` (with trailing space; plate present) |
+
+### 0x0010 — Debug / Trace Log
+
+Detailed internal method-level logging from the LC firmware. Same ACK pattern as 0x000E.
+
+**LC → HOST format:**
+```
+<seq_number>
+<timestamp>
+<internal_code>
+<ClassName::MethodName: human-readable detail>
+```
+
+**Observed internal codes and their meanings:**
+
+| Code | Module | Example Message |
+|------|--------|-----------------|
+| 100905080 | Detection/Camera | `MRCDetectionCameraActivate::OnAnswer: camera activated` |
+| 100905081 | Detection/Camera | `MRCDetectionCameraActivate::OnStart: arm camera` |
+| 100905010 | Detection/Acquisition | `Perform Acq!` |
+| 100905020 | Detection/Acquisition | `Acq performed! RefChannelValue sent from RawataReduction controller: 12765` |
+| 100905030 | Detection/Acquisition | `Acquisition prepared!` |
+| 100905050 | Detection/WellCoords | `MRCDetectionCalcWellCoordinates::OnAnswer: CoverMarker coordinates: ...` |
+| 100905090 | Detection/Camera | `MRCDetectionCameraDeactivate::OnAnswer: camera deactivated` |
+| 100905120 | Detection/Lamp | `Initiate LampIntensity measuring!` |
+| 100905130 | Detection/Lamp | `Origin Lamp Intensity: 6674  Current Lamp Intensity: 6381` |
+| 100905145 | Detection/HotPixel | `MRCDetectionSearchHotPixels::OnAnswer: ImageId: 3, NumberOfHotPixels: 18` |
+| 100905160 | Detection/Config | `Set Radius in RawdataReduction controller: Block Type 2, Plate Type 0, Volume 20, Radius 12` |
+| 100905170 | Detection/Results | `MRCResultReadResult::OnAnswer(): Average bias value received: 515` |
+| 100905229 | Detection/Buffer | `MRCDetectionCheckImageBuffer::OnStart` |
+| 100905230 | Detection/Buffer | `MRCDetectionCheckImageBuffer::OnAnswer: 0 images in camera buffer` |
+| 100405050 | ExerunServer | `MRCExerunServerInit::OnAnswer: Application init finished.` |
+| 100405060 | ExerunServer | `MRCExerunServerWaitExperimentEnd::OnAnswer: End of Run and Experiment.` |
+| 100405070 | ExerunServer | `STCExerunServerInit::OnAnswer: Powerfail has ocurred...` |
+| 100705010 | RunSequencer | `MRCRunSequencerExecuteRun::OnStart: TickBackup has been stopped.` |
+| 100705020 | RunSequencer | `MRCRunSequencerFinishRun::OnAnswer: TickBackup has been restarted.` |
+| 100705030 | RunSequencer | `MRCRunSequencerFinishRun::OnAnswer: Number of images = 0` |
+| 100705040 | RunSequencer | `MRCRunSequencerFinishRun::OnAnswer: Terminated regularly` |
+| 101105020 | Loading | `MRCLoadingMoveToBarcodeRead::OnAnswer: Barcode read : ` |
+| 101105220 | Loading | `MRCLoadingMoveToBarcodeRead::IsMWPCompatible:Detection MWP Type: eMWP384` |
+
+---
+
+### 0x0033 — Instrument Status Query
+
+HOST sends an empty (1-byte space) request; LC returns 24 numeric values with instrument telemetry.
+
+**Response fields (best guess from 4 observations):**
+
+```
+Position  Example Values (pre/post run)    Likely Meaning
+───────────────────────────────────────────────────────
+0         248671 → 248672                   Uptime counter (incrementing)
+1         1495261                           Serial/ID (constant)
+2         293098 → 293099                   Operation counter (incrementing)
+3         67                                (constant)
+4         58                                (constant)
+5         4064 → 4065                       (incrementing slowly)
+6         4057 → 4058                       (incrementing slowly)
+7         1                                 (constant)
+8         20                                Volume setting (µL)
+9         0                                 (constant)
+10        45                                (constant)
+11        16946                             (constant)
+12        8250 → 8252                       (incrementing slowly)
+13        2277                              (constant)
+14        51                                (constant)
+15        555043 → 555046                   Total runtime/counter
+16        6                                 (constant)
+17        6674                              Origin lamp intensity
+18        6477 → 6381                       Current lamp intensity (decreasing!)
+19        2500                              (constant)
+20        0                                 (constant)
+21-23     1625644356, 1065064231, 1129670778  Possibly timestamps or checksums
+24        1200000                           (constant)
+```
+
+Notable: field 18 (current lamp intensity) decreased from 6477 to 6381 over the run, consistent with lamp warm-up/usage drift.
+
+---
+
+### 0x047F — Plate Status Query
+
+HOST sends empty request; LC returns single value `0` (plate status/position).
+
+### 0x04B0 — Unknown Query
+
+HOST sends `15`; LC returns `0`. Observed twice (pre-run and post-run). Possibly a status check or reset command.
+
+---
+
+## Run Configuration Commands (HOST → LC)
+
+These are sent in rapid sequence (~120.6s) to configure the experiment. Each gets a simple `0\n<seq>\n0` ACK from the LC (status 0 = OK, echo seq number, error code 0).
+
+### 0x012D — Experiment Setup
+```
+<seq>
+<experiment_GUID>
+<well_count>
+<num_cycles>
+<unknown>
+```
+Example: `1\nDC69630C99DE498AA727688B310ABCCF\n384\n20\n1`
+
+### 0x012F — Detection Configuration
+```
+<seq>
+<program>
+<step>
+<unknown>
+<filter_1>
+<filter_2>
+<num_channels>
+```
+Example: `2\n1\n1\n0\n1\n1\n3` → Program 1, Step 1, 3 detection channels
+
+### 0x0131 — Thermal Profile
+```
+<seq>
+<program>
+<step>
+<unknown>
+<hold_time_ms>
+<ramp_rate?>
+<num_steps?>
+<unknown>
+<unknown>
+```
+Example: `3\n1\n1\n0\n3000\n1\n2\n1\n100` → 3000ms hold time
+
+### 0x0132 — Channel/Filter Configuration (one per channel)
+```
+<seq>
+<program>
+<channel_number>
+<param_a>           → 3700 (internal code, not a direct wavelength — see Optics notes)
+<unknown>           → 1
+<param_b>           → 4800 (internal code, not a direct wavelength — see Optics notes)
+<exposure_ms?>      → 500
+<zero>
+<zero>
+<zero>
+<enabled>           → 1
+```
+Example: `4\n1\n1\n3700\n1\n4800\n500\n0\n0\n0\n1`
+
+Three channels were configured in this run, all with identical parameters. See "Optics & Detection" section below for interpretation.
+
+### 0x0130 — Query (unknown, pre-run)
+HOST sends `<seq>\n?`; LC responds `0\n<seq>\n0`. Possibly a readiness check.
+
+### 0x012E — Query (unknown, pre-run)
+Same `?` pattern as 0x0130.
+
+### 0x00C9 — Query (unknown, pre-run)
+HOST sends `<seq>\n?`; LC responds `0\n<seq>\n0\n1`. The extra `1` may indicate "ready" or "armed."
+
+---
+
+## Data Acquisition Cycle
+
+During the run, each cycle follows this repeating pattern:
+
+```
+1. LC: "Acquisition prepared!"           (0x0010, code 100905030)
+2. LC: "Perform Acq!"                    (0x0010, code 100905010)
+3. LC: 202 thermal data update           (0x000E, 5 time/temp pairs)
+4. LC: "Acq performed! RefChannelValue"  (0x0010, code 100905020)
+5. LC: 103 cycle marker                  (0x000E: program step cycle)
+6. LC: Bias value + block read order     (0x0010, code 100905170)
+7. LC: 201 acquisition complete          (0x000E: wells program step cycle)
+8. HOST: 0x044D request with cycle #
+9. LC: 0x044D response with full well data (1240B)
+10. HOST: 0x044F query → LC confirms well count
+11. HOST: 0x044E confirm → LC ACKs
+```
+
+---
+
+## Result Data — 0x044D
+
+The main fluorescence result payload. HOST requests by cycle number; LC responds with ~1240 bytes.
+
+### Request (HOST → LC):
+```
+<cycle_number>
+```
+
+### Response (LC → HOST):
+```
+<status>           → 0 (OK)
+<unknown>          → 1
+<unknown>          → 2
+<unknown>          → 1
+<experiment_GUID>
+<program>          → 1
+<step>             → 1
+<cycle_number>     → 1, 2, 3
+<elapsed_csec>     → e.g. 10820 (= 108.20 seconds)
+<temperature_cdeg> → e.g. 3708 (= 37.08°C)
+<unknown>          → 389949 (constant; possibly config hash)
+<ref_channel>      → 12765 (matches RefChannelValue from trace log)
+<unknown>          → 0
+<well_count>       → 384
+<well_1_value>     → fluorescence intensity
+<well_2_value>
+...
+<well_384_value>
+```
+
+Values are raw fluorescence intensities (typical range: 20–700, with outliers like 688, 317, 208 suggesting specific well content).
+
+### 0x044F — Result Metadata Query
+HOST sends empty; LC responds: `0\n<unknown>\n<cycle>\n<well_count>`
+
+### 0x044E — Result Acknowledge
+HOST sends cycle number; LC responds `0` (acknowledged/cleared).
+
+---
+
+## Thermal Profile Data (Status 202)
+
+Sent periodically via 0x000E during the run. Format:
+
+```
+<num_points> <time1> <temp1> <time2> <temp2> ...
+```
+
+- Time: centiseconds elapsed since run start
+- Temperature: centidegrees Celsius
+
+Observed thermal profile: room temperature (~19.7°C) → ramp to 37.0°C → hold at 37.0°C for remainder. This is consistent with a **DNA quantification** assay (e.g., fluorescent dye-based DNA quantification at a controlled temperature) rather than traditional PCR thermocycling or isothermal amplification. The 37°C hold provides a stable, consistent environment for fluorescence measurement — no amplification is occurring.
+
+---
+
+## Optics & Detection
+
+### Physical Filter System
+
+The LightCycler 480 II has two filter wheels:
+
+| Position | Excitation (nm) | Bandpass |
+|----------|----------------|----------|
+| 1        | 440            | ±35      |
+| 2        | 465            | ±25      |
+| 3        | 498            | ±40      |
+| 4        | 533            | ±25      |
+| 5        | 618            | ±35      |
+
+| Position | Emission (nm)  | Bandpass |
+|----------|----------------|----------|
+| 1        | 488            | ±20      |
+| 2        | 510            | ±20      |
+| 3        | 580            | ±20      |
+| 4        | 610            | ±20      |
+| 5        | 640            | ±20      |
+| 6        | 660            | 95 (LP)  |
+
+Standard filter combinations for common dyes:
+
+| Dye           | Excitation (nm) | Emission (nm) | LC480 II Notation |
+|---------------|----------------|---------------|-------------------|
+| FAM / SYBR Green I | 465       | 510           | 465–510           |
+| HEX / VIC     | 533            | 580           | 533–580           |
+| ROX           | 533            | 610           | 533–610           |
+| Cy5           | 618            | 660           | 618–660           |
+
+### Interpretation of This Run's Channel Config
+
+The protocol values `3700` and `4800` in the 0x0132 messages are **not** direct wavelengths (370nm/480nm don't match any physical filter). They are internal firmware codes — likely filter wheel position indices or scaled identifiers. Their exact encoding remains to be determined from additional captures with different filter settings.
+
+**Why 3 "channels" with identical settings?**
+
+The 3 channels do **not** represent 3 different dyes. They correspond to **3 CCD image blocks** — physical regions of the 384-well plate that the camera reads sequentially. Evidence:
+
+- All 3 channel configurations are byte-identical
+- The trace log shows `MRCResultReadResult::OnAnswer Order not respected, read BlockId: 2, expected: 1, ImageId: 5` — the CCD reads 3 blocks per acquisition and they sometimes arrive out of order
+- The `Set Radius in RawdataReduction controller: Block Type 2, Plate Type 0` message confirms block-based image processing
+- Each 0x044D result packet contains exactly 384 values (all wells), assembled from the 3 block reads
+
+**Likely filter combination:** The standard FAM/SYBR Green I channel (465nm excitation / 510nm emission) is the most probable setting for a single-dye DNA quantification assay. SYBR Green I or a similar intercalating dye (e.g., ResoLight) binds to double-stranded DNA, and fluorescence intensity is proportional to DNA concentration — no amplification required.
+
+### Application Context
+
+This run is a **fluorescent dye-based DNA quantification**, not PCR or isothermal amplification:
+
+- **No thermocycling** — the plate is held at a constant 37°C, which is simply a controlled measurement temperature, not a reaction condition
+- **Multiple reads** — the 3 acquisition cycles (configured for up to 20) provide replicate measurements for averaging/precision, not amplification cycle tracking
+- **The fluorescence values** (typical range 20–700) represent the amount of dsDNA present in each well at the time of measurement, not an accumulating signal
+- **384-well format** — consistent with high-throughput DNA quantification workflows where many samples are measured in parallel
+- The run was configured for 20 cycles but only 3 were executed — likely sufficient for reliable quantification (or a test run)
+
+---
+
+## Full Run Timeline
+
+| Time (s) | Phase | Key Events |
+|----------|-------|------------|
+| 0–12 | Keepalive only | Connection established |
+| 12–13 | Init: Detection | Filter wheels, camera activate, well coordinate calc |
+| 13–40 | Init: Calibration | Hot pixel search, dark value measurement |
+| 40–49 | Init: Detection done | Camera deactivated |
+| 49–61 | Init: System | RunSequencer init, application init, powerfail cleanup |
+| 61–76 | Idle | State transitions |
+| 76–92 | Loading | Barcode read (empty), 384-well plate detected |
+| 92–103 | Pre-run queries | Plate status, instrument status |
+| 103–121 | Run config | Experiment GUID, detection blocks, thermal profile sent |
+| 121–130 | Warm-up | Lamp intensity measurement, thermal ramp to 37°C |
+| 130–136 | Read 1 | Camera arm → acquire → read 384 wells (all 3 CCD blocks) |
+| 136–142 | Read 2 | Acquire → read 384 wells |
+| 142–148 | Read 3 | Acquire → read 384 wells → camera deactivate |
+| 148–159 | Finish | Image buffer check, run termination, tick backup restart |
+| 159–161 | Post-run | Instrument status queries (×2), final status check |
+
+**Total active run time: ~2.5 minutes** (3 fluorescence reads of 384 wells at 37°C isothermal hold)
+
+---
+
+## Notes
+
+- This is a **DNA quantification run**, not PCR or amplification. The LightCycler is being used as a fluorescence plate reader at 37°C, measuring dye-bound dsDNA across 384 wells.
+- The run was configured for 20 read cycles (`0x012D`) but only 3 were executed — likely sufficient for reliable quantification, or a test/demo run.
+- The 3 "channels" in the detection config are CCD image blocks, not separate dye channels. The "Order not respected" warnings in 0x0010 (code 100905170) confirm the camera reads the plate in 3 physical blocks that sometimes arrive out of sequence — the system handles this gracefully.
+- The GUID `DC69630C99DE498AA727688B310ABCCF` ties all result data back to this specific experiment.
+- Barcode read was empty — no barcode label on the plate.
+- The protocol values `3700`/`4800` in 0x0132 need captures with different filter settings to fully decode the encoding scheme. A run using a known different filter combination (e.g., HEX at 533/580) would reveal whether these are position indices, scaled wavelengths, or something else entirely.
+- Lamp intensity decreased from 6477 to 6381 over the ~2.5 minute run — normal drift, tracked by the instrument for compensation via the RefChannelValue.
