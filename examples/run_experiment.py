@@ -13,9 +13,12 @@ from __future__ import annotations
 import argparse
 import csv
 import logging
+import os
 import sys
 import threading
 import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from lightcycler import (
     LightCyclerConnection, ResultData,
@@ -36,7 +39,8 @@ FILTER_MAP = {
 
 def run_experiment(conn: LightCyclerConnection,
                    config: ExperimentConfig,
-                   output_path: str | None) -> list[ResultData] | None:
+                   output_path: str | None,
+                   skip_init: bool = False) -> list[ResultData] | None:
     """Execute the full experiment sequence on an active connection.
 
     Phases match the captured protocol trace timing:
@@ -51,33 +55,42 @@ def run_experiment(conn: LightCyclerConnection,
     commands = build_commands(config)
     num_acq = sum(len(p.acquisitions) for p in config.programs)
 
-    # --- Phase 1: Initialization (~61s on real instrument) ---
-    log.info("Phase 1: Waiting for initialization...")
-    conn.wait_for_event(
-        lambda f: (len(f) > 4
-                   and f[2] == '90'
-                   and f[3].strip() == '11'
-                   and f[4].strip() == '100'),
-        timeout=120,
-    )
-    log.info("Initialization complete")
+    if skip_init:
+        # Drain any buffered historical events (give them time to arrive)
+        log.info("Phase 1-2: Skipping init (--skip-init), draining events...")
+        time.sleep(15)
+        with conn._events_lock:
+            n = len(conn._events)
+            conn._events.clear()
+        log.info("Drained %d buffered events", n)
+    else:
+        # --- Phase 1: Initialization (~61s on real instrument) ---
+        log.info("Phase 1: Waiting for initialization...")
+        conn.wait_for_event(
+            lambda f: (len(f) > 4
+                       and f[2] == '90'
+                       and f[3].strip() == '11'
+                       and f[4].strip() == '100'),
+            timeout=120,
+        )
+        log.info("Initialization complete")
 
-    # --- Phase 2: Plate loading ---
-    log.info("Phase 2: Waiting for plate loading...")
-    conn.wait_for_event(lambda f: len(f) > 2 and f[2] == '303', timeout=120)
-    log.info("Plate loaded")
+        # --- Phase 2: Plate loading ---
+        log.info("Phase 2: Waiting for plate loading...")
+        conn.wait_for_event(lambda f: len(f) > 2 and f[2] == '303', timeout=120)
+        log.info("Plate loaded")
 
-    # Immediate load state query after plate detection
-    conn.query(MSG_QUERY_LOAD_STATE)
+        # Immediate load state query after plate detection
+        conn.query(MSG_QUERY_LOAD_STATE)
 
-    # Wait for instrument to reach idle state
-    conn.wait_for_event(
-        lambda f: (len(f) > 3
-                   and f[2] == '11'
-                   and f[3].strip() == '10'),
-        timeout=60,
-    )
-    log.info("Instrument idle")
+        # Wait for instrument to reach idle state
+        conn.wait_for_event(
+            lambda f: (len(f) > 3
+                       and f[2] == '11'
+                       and f[3].strip() == '10'),
+            timeout=60,
+        )
+        log.info("Instrument idle")
 
     # --- Phase 3: Pre-experiment queries ---
     log.info("Phase 3: Pre-experiment queries")
@@ -221,6 +234,8 @@ def main():
                         choices=list(FILTER_MAP.keys()))
     parser.add_argument('--output', '-o', default='results.csv',
                         help='Output CSV path')
+    parser.add_argument('--skip-init', action='store_true',
+                        help='Skip init/loading wait (machine already running)')
     parser.add_argument('--mock', action='store_true',
                         help='Use built-in mock simulator')
     parser.add_argument('--mock-speed', type=float, default=50.0,
@@ -271,8 +286,11 @@ def main():
     # Connect and run
     conn = LightCyclerConnection(args.host, args.port)
     try:
-        conn.connect()
-        results = run_experiment(conn, config, args.output)
+        info = conn.connect()
+        log.info("Connected: %s firmware %s", info.controller_count,
+                 info.firmware_version)
+        results = run_experiment(conn, config, args.output,
+                                 skip_init=args.skip_init)
         sys.exit(0 if results else 1)
     except KeyboardInterrupt:
         log.info("Interrupted by user")

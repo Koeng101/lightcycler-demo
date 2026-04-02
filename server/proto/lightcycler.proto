@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package lightcycler.v1;
+
+// LightCyclerService controls a Roche LightCycler 480 II qPCR instrument.
+service LightCyclerService {
+  // Machine state and logs
+  rpc GetState(GetStateRequest) returns (GetStateResponse);
+  rpc GetLogs(GetLogsRequest) returns (GetLogsResponse);
+
+  // Experiments (fire-and-forget: RunExperiment returns immediately)
+  rpc RunExperiment(RunExperimentRequest) returns (RunExperimentResponse);
+  rpc GetExperiment(GetExperimentRequest) returns (GetExperimentResponse);
+  rpc ListExperiments(ListExperimentsRequest) returns (ListExperimentsResponse);
+
+  // Door control (SwitchBot Fingerbot)
+  rpc OpenDoor(OpenDoorRequest) returns (OpenDoorResponse);
+  rpc CloseDoor(CloseDoorRequest) returns (CloseDoorResponse);
+  rpc GetDoorStatus(GetDoorStatusRequest) returns (GetDoorStatusResponse);
+}
+
+// --- Machine state ---
+
+message GetStateRequest {}
+
+message GetStateResponse {
+  int32 instrument_state = 1;   // 6=post-init, 7=running, 10=idle
+  string firmware_version = 2;
+  string controller_count = 3;
+  bool connected = 4;
+  string current_experiment_guid = 5;  // empty if none running
+}
+
+// --- Logs ---
+
+message GetLogsRequest {
+  int32 limit = 1;  // max entries to return (default 100)
+  int32 since_id = 2;  // return entries with id > since_id
+}
+
+message LogEntry {
+  int64 id = 1;
+  string timestamp = 2;
+  int32 event_code = 3;
+  string sub_code = 4;
+  string message = 5;
+}
+
+message GetLogsResponse {
+  repeated LogEntry entries = 1;
+}
+
+// --- Experiments ---
+
+enum FilterSet {
+  FILTER_UNSPECIFIED = 0;
+  SYBR_GREEN = 1;  // FAM / SYBR Green I (465/510 nm)
+  HEX = 2;         // HEX / VIC (533/580 nm)
+  ROX = 3;         // ROX (533/610 nm)
+  CY5 = 4;         // Cy5 (618/660 nm)
+}
+
+enum ExperimentStatus {
+  STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  RUNNING = 2;
+  COMPLETE = 3;
+  ERROR = 4;
+}
+
+message RunExperimentRequest {
+  double temp_c = 1;          // target temperature (default 37.0)
+  double hold_time_s = 2;     // hold time per read in seconds (default 1.0)
+  int32 num_acquisitions = 3; // number of plate reads (default 3)
+  FilterSet filter = 4;       // filter set (default SYBR_GREEN)
+  int32 well_count = 5;       // 96 or 384 (default 384)
+  int32 volume_ul = 6;        // reaction volume in uL (default 20)
+}
+
+message RunExperimentResponse {
+  string guid = 1;  // experiment GUID, use with GetExperiment to poll
+}
+
+message GetExperimentRequest {
+  string guid = 1;
+}
+
+message Acquisition {
+  int32 acquisition_num = 1;
+  double temperature_c = 2;
+  double time_s = 3;
+  int32 ref_channel = 4;
+  repeated int32 well_values = 5;  // fluorescence per well
+}
+
+message GetExperimentResponse {
+  string guid = 1;
+  ExperimentStatus status = 2;
+  RunExperimentRequest config = 3;
+  string created_at = 4;
+  string completed_at = 5;
+  string error_message = 6;
+  repeated Acquisition acquisitions = 7;
+}
+
+message ListExperimentsRequest {
+  int32 limit = 1;  // default 50
+}
+
+message ListExperimentsResponse {
+  message ExperimentSummary {
+    string guid = 1;
+    ExperimentStatus status = 2;
+    string created_at = 3;
+    int32 num_acquisitions = 4;
+  }
+  repeated ExperimentSummary experiments = 1;
+}
+
+// --- Door control ---
+
+message OpenDoorRequest {}
+message OpenDoorResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message CloseDoorRequest {}
+message CloseDoorResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message GetDoorStatusRequest {}
+message GetDoorStatusResponse {
+  int32 battery_percent = 1;
+  bool available = 2;  // BLE reachable
+  string error = 3;
+}

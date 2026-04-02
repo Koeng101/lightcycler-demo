@@ -1,0 +1,41 @@
+Type	Date	Time	Message	
+Warning	03/19/2026	10:17:48 PM	The supplied password does not match user admin!	1821
+Error	03/19/2026	10:18:48 PM	Restart instrument, inform Roche service	500400040
+Error	03/19/2026	10:18:49 PM	Restart instrument, inform Roche service	500400040
+Error	03/19/2026	10:18:49 PM	Restart instrument, inform Roche service	500400040
+Information	03/19/2026	10:18:49 PM	 Initialisation of Instrument started. This may take several minutes. Please wait.	
+Warning	03/19/2026	10:18:50 PM	Command not allowed	100600130
+Information	03/19/2026	10:18:53 PM	 Initialisation of Instrument started. This may take several minutes. Please wait.	
+Information	03/19/2026	10:18:54 PM	 Initialisation of Instrument. LED started	
+Information	03/19/2026	10:18:54 PM	 Initialisation of Instrument. LED done.	
+Information	03/19/2026	10:18:54 PM	 Initialisation of Instrument. Asynchronous controller errors registered.	
+Information	03/19/2026	10:18:54 PM	 Initialisation of Instrument. ErrorHandler done.	
+Information	03/19/2026	10:18:55 PM	 Initialisation of Instrument. EventHandler started.	
+Information	03/19/2026	10:18:55 PM	 Initialisation of Instrument. EventHandler done.	
+Information	03/19/2026	10:18:55 PM	 Initialisation of Instrument. Barcode reader started.	
+Information	03/19/2026	10:18:55 PM	 Initialisation of Instrument. Barcode reader done.	
+Information	03/19/2026	10:18:55 PM	 Initialisation of Instrument. BlockThermoCycler started.	
+Information	03/19/2026	10:18:56 PM	 Initialisation of Instrument. BlockThermoCycler done.	
+Information	03/19/2026	10:18:56 PM	 Initialisation of Instrument. Loading started.	
+Warning	03/19/2026	10:18:56 PM	Check MWP/block/cover configuration	101100400
+Warning	03/19/2026	10:18:57 PM	Check MWP/block/cover configuration	101100400
+Warning	03/19/2026	10:18:57 PM	Check MWP/block/cover configuration	101100400
+Information	03/19/2026	10:18:58 PM	 Initialisation of Instrument. Loading done.	
+Information	03/19/2026	10:18:58 PM	 Initialisation of Instrument. Lamp started.	
+Information	03/19/2026	10:18:58 PM	 Initialisation of Instrument. Lamp done.	
+Information	03/19/2026	10:18:58 PM	 Initialisation of Instrument. RunSequencer, Detection started.	
+Information	03/19/2026	10:18:58 PM	 Initialisation of Instrument. Detection started.	
+Information	03/19/2026	10:18:59 PM	 Initialisation of Instrument. Camera cooling surveillance started.	
+Information	03/19/2026	10:18:59 PM	 Initialisation of Instrument. Camera cooling done.	
+Information	03/19/2026	10:18:59 PM	 Initialisation of Instrument. FilterWheels initialisation started.	
+Information	03/19/2026	10:19:01 PM	 Initialisation of Instrument. FilterWheels initialisation done.	
+Information	03/19/2026	10:19:01 PM	 Initialisation of Instrument. WellCoordinates calculation started.	
+Information	03/19/2026	10:19:02 PM	 Initialisation of Instrument. WellCoordinates calculation done.	
+Information	03/19/2026	10:19:03 PM	 Initialisation of Instrument. HotPixel search started.	
+Information	03/19/2026	10:19:14 PM	 Initialisation of Instrument. HotPixel search done.	
+Information	03/19/2026	10:19:14 PM	 Initialisation of Instrument. DarkValue measurement started.	
+Information	03/19/2026	10:19:23 PM	 Initialisation of Instrument. Detection done.	
+Information	03/19/2026	10:19:23 PM	 Initialisation of Instrument. RunSequencer, Detection  done.	
+Information	03/19/2026	10:19:23 PM	 Initialisation of Instrument finished.	
+Information	03/19/2026	10:20:00 PM	 Instrument Warm Up. This may take several minutes.	
+Information	03/19/2026	10:20:09 PM	 Instrument Warm Up finished.	
