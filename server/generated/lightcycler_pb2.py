@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11lightcycler.proto\x12\x0elightcycler.v1\"\x11\n\x0fGetStateRequest\"\xe9\x01\n\x10GetStateResponse\x12)\n\x10instrument_state\x18\x01 \x01(\x05R\x0finstrumentState\x12)\n\x10\x66irmware_version\x18\x02 \x01(\tR\x0f\x66irmwareVersion\x12)\n\x10\x63ontroller_count\x18\x03 \x01(\tR\x0f\x63ontrollerCount\x12\x1c\n\tconnected\x18\x04 \x01(\x08R\tconnected\x12\x36\n\x17\x63urrent_experiment_guid\x18\x05 \x01(\tR\x15\x63urrentExperimentGuid\"A\n\x0eGetLogsRequest\x12\x14\n\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x19\n\x08since_id\x18\x02 \x01(\x05R\x07sinceId\"\x8c\x01\n\x08LogEntry\x12\x0e\n\x02id\x18\x01 \x01(\x03R\x02id\x12\x1c\n\ttimestamp\x18\x02 \x01(\tR\ttimestamp\x12\x1d\n\nevent_code\x18\x03 \x01(\x05R\teventCode\x12\x19\n\x08sub_code\x18\x04 \x01(\tR\x07subCode\x12\x18\n\x07message\x18\x05 \x01(\tR\x07message\"E\n\x0fGetLogsResponse\x12\x32\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x18.lightcycler.v1.LogEntryR\x07\x65ntries\"\xe7\x01\n\x14RunExperimentRequest\x12\x15\n\x06temp_c\x18\x01 \x01(\x01R\x05tempC\x12\x1e\n\x0bhold_time_s\x18\x02 \x01(\x01R\tholdTimeS\x12)\n\x10num_acquisitions\x18\x03 \x01(\x05R\x0fnumAcquisitions\x12\x31\n\x06\x66ilter\x18\x04 \x01(\x0e\x32\x19.lightcycler.v1.FilterSetR\x06\x66ilter\x12\x1d\n\nwell_count\x18\x05 \x01(\x05R\twellCount\x12\x1b\n\tvolume_ul\x18\x06 \x01(\x05R\x08volumeUl\"+\n\x15RunExperimentResponse\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\"*\n\x14GetExperimentRequest\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\"\xb4\x01\n\x0b\x41\x63quisition\x12\'\n\x0f\x61\x63quisition_num\x18\x01 \x01(\x05R\x0e\x61\x63quisitionNum\x12#\n\rtemperature_c\x18\x02 \x01(\x01R\x0ctemperatureC\x12\x15\n\x06time_s\x18\x03 \x01(\x01R\x05timeS\x12\x1f\n\x0bref_channel\x18\x04 \x01(\x05R\nrefChannel\x12\x1f\n\x0bwell_values\x18\x05 \x03(\x05R\nwellValues\"\xcb\x02\n\x15GetExperimentResponse\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\x12\x38\n\x06status\x18\x02 \x01(\x0e\x32 .lightcycler.v1.ExperimentStatusR\x06status\x12<\n\x06\x63onfig\x18\x03 \x01(\x0b\x32$.lightcycler.v1.RunExperimentRequestR\x06\x63onfig\x12\x1d\n\ncreated_at\x18\x04 \x01(\tR\tcreatedAt\x12!\n\x0c\x63ompleted_at\x18\x05 \x01(\tR\x0b\x63ompletedAt\x12#\n\rerror_message\x18\x06 \x01(\tR\x0c\x65rrorMessage\x12?\n\x0c\x61\x63quisitions\x18\x07 \x03(\x0b\x32\x1b.lightcycler.v1.AcquisitionR\x0c\x61\x63quisitions\".\n\x16ListExperimentsRequest\x12\x14\n\x05limit\x18\x01 \x01(\x05R\x05limit\"\xa4\x02\n\x17ListExperimentsResponse\x12[\n\x0b\x65xperiments\x18\x01 \x03(\x0b\x32\x39.lightcycler.v1.ListExperimentsResponse.ExperimentSummaryR\x0b\x65xperiments\x1a\xab\x01\n\x11\x45xperimentSummary\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\x12\x38\n\x06status\x18\x02 \x01(\x0e\x32 .lightcycler.v1.ExperimentStatusR\x06status\x12\x1d\n\ncreated_at\x18\x03 \x01(\tR\tcreatedAt\x12)\n\x10num_acquisitions\x18\x04 \x01(\x05R\x0fnumAcquisitions\"\x11\n\x0fOpenDoorRequest\"B\n\x10OpenDoorResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x14\n\x05\x65rror\x18\x02 \x01(\tR\x05\x65rror\"\x12\n\x10\x43loseDoorRequest\"C\n\x11\x43loseDoorResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x14\n\x05\x65rror\x18\x02 \x01(\tR\x05\x65rror\"\x16\n\x14GetDoorStatusRequest\"t\n\x15GetDoorStatusResponse\x12\'\n\x0f\x62\x61ttery_percent\x18\x01 \x01(\x05R\x0e\x62\x61tteryPercent\x12\x1c\n\tavailable\x18\x02 \x01(\x08R\tavailable\x12\x14\n\x05\x65rror\x18\x03 \x01(\tR\x05\x65rror*N\n\tFilterSet\x12\x16\n\x12\x46ILTER_UNSPECIFIED\x10\x00\x12\x0e\n\nSYBR_GREEN\x10\x01\x12\x07\n\x03HEX\x10\x02\x12\x07\n\x03ROX\x10\x03\x12\x07\n\x03\x43Y5\x10\x04*]\n\x10\x45xperimentStatus\x12\x16\n\x12STATUS_UNSPECIFIED\x10\x00\x12\x0b\n\x07PENDING\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\x0c\n\x08\x43OMPLETE\x10\x03\x12\t\n\x05\x45RROR\x10\x04\x32\xce\x05\n\x12LightCyclerService\x12M\n\x08GetState\x12\x1f.lightcycler.v1.GetStateRequest\x1a .lightcycler.v1.GetStateResponse\x12J\n\x07GetLogs\x12\x1e.lightcycler.v1.GetLogsRequest\x1a\x1f.lightcycler.v1.GetLogsResponse\x12\\\n\rRunExperiment\x12$.lightcycler.v1.RunExperimentRequest\x1a%.lightcycler.v1.RunExperimentResponse\x12\\\n\rGetExperiment\x12$.lightcycler.v1.GetExperimentRequest\x1a%.lightcycler.v1.GetExperimentResponse\x12\x62\n\x0fListExperiments\x12&.lightcycler.v1.ListExperimentsRequest\x1a\'.lightcycler.v1.ListExperimentsResponse\x12M\n\x08OpenDoor\x12\x1f.lightcycler.v1.OpenDoorRequest\x1a .lightcycler.v1.OpenDoorResponse\x12P\n\tCloseDoor\x12 .lightcycler.v1.CloseDoorRequest\x1a!.lightcycler.v1.CloseDoorResponse\x12\\\n\rGetDoorStatus\x12$.lightcycler.v1.GetDoorStatusRequest\x1a%.lightcycler.v1.GetDoorStatusResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11lightcycler.proto\x12\x0elightcycler.v1\"\x11\n\x0fGetStateRequest\"\xe9\x01\n\x10GetStateResponse\x12)\n\x10instrument_state\x18\x01 \x01(\x05R\x0finstrumentState\x12)\n\x10\x66irmware_version\x18\x02 \x01(\tR\x0f\x66irmwareVersion\x12)\n\x10\x63ontroller_count\x18\x03 \x01(\tR\x0f\x63ontrollerCount\x12\x1c\n\tconnected\x18\x04 \x01(\x08R\tconnected\x12\x36\n\x17\x63urrent_experiment_guid\x18\x05 \x01(\tR\x15\x63urrentExperimentGuid\"A\n\x0eGetLogsRequest\x12\x14\n\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x19\n\x08since_id\x18\x02 \x01(\x05R\x07sinceId\"\x8c\x01\n\x08LogEntry\x12\x0e\n\x02id\x18\x01 \x01(\x03R\x02id\x12\x1c\n\ttimestamp\x18\x02 \x01(\tR\ttimestamp\x12\x1d\n\nevent_code\x18\x03 \x01(\x05R\teventCode\x12\x19\n\x08sub_code\x18\x04 \x01(\tR\x07subCode\x12\x18\n\x07message\x18\x05 \x01(\tR\x07message\"E\n\x0fGetLogsResponse\x12\x32\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x18.lightcycler.v1.LogEntryR\x07\x65ntries\"\xb7\x01\n\x04Step\x12#\n\rtemperature_c\x18\x01 \x01(\x01R\x0ctemperatureC\x12!\n\x0chold_seconds\x18\x02 \x01(\x01R\x0bholdSeconds\x12\x18\n\x07\x61\x63quire\x18\x03 \x01(\x08R\x07\x61\x63quire\x12\x31\n\x06\x66ilter\x18\x04 \x01(\x0e\x32\x19.lightcycler.v1.FilterSetR\x06\x66ilter\x12\x1a\n\x08\x65xposure\x18\x05 \x01(\x05R\x08\x65xposure\"M\n\x05Stage\x12*\n\x05steps\x18\x01 \x03(\x0b\x32\x14.lightcycler.v1.StepR\x05steps\x12\x18\n\x07repeats\x18\x02 \x01(\x05R\x07repeats\"\x81\x01\n\x14RunExperimentRequest\x12-\n\x06stages\x18\x01 \x03(\x0b\x32\x15.lightcycler.v1.StageR\x06stages\x12\x1d\n\nwell_count\x18\x02 \x01(\x05R\twellCount\x12\x1b\n\tvolume_ul\x18\x03 \x01(\x05R\x08volumeUl\"+\n\x15RunExperimentResponse\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\"*\n\x14GetExperimentRequest\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\"\x8a\x02\n\x0b\x41\x63quisition\x12\'\n\x0f\x61\x63quisition_num\x18\x01 \x01(\x05R\x0e\x61\x63quisitionNum\x12\x1f\n\x0bstage_index\x18\x02 \x01(\x05R\nstageIndex\x12\x1d\n\nstep_index\x18\x03 \x01(\x05R\tstepIndex\x12\x14\n\x05\x63ycle\x18\x04 \x01(\x05R\x05\x63ycle\x12#\n\rtemperature_c\x18\x05 \x01(\x01R\x0ctemperatureC\x12\x15\n\x06time_s\x18\x06 \x01(\x01R\x05timeS\x12\x1f\n\x0bref_channel\x18\x07 \x01(\x05R\nrefChannel\x12\x1f\n\x0bwell_values\x18\x08 \x03(\x05R\nwellValues\"\xf8\x02\n\x15GetExperimentResponse\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\x12\x38\n\x06status\x18\x02 \x01(\x0e\x32 .lightcycler.v1.ExperimentStatusR\x06status\x12-\n\x06stages\x18\x03 \x03(\x0b\x32\x15.lightcycler.v1.StageR\x06stages\x12\x1d\n\nwell_count\x18\x04 \x01(\x05R\twellCount\x12\x1b\n\tvolume_ul\x18\x05 \x01(\x05R\x08volumeUl\x12\x1d\n\ncreated_at\x18\x06 \x01(\tR\tcreatedAt\x12!\n\x0c\x63ompleted_at\x18\x07 \x01(\tR\x0b\x63ompletedAt\x12#\n\rerror_message\x18\x08 \x01(\tR\x0c\x65rrorMessage\x12?\n\x0c\x61\x63quisitions\x18\t \x03(\x0b\x32\x1b.lightcycler.v1.AcquisitionR\x0c\x61\x63quisitions\".\n\x16ListExperimentsRequest\x12\x14\n\x05limit\x18\x01 \x01(\x05R\x05limit\"\xa4\x02\n\x17ListExperimentsResponse\x12[\n\x0b\x65xperiments\x18\x01 \x03(\x0b\x32\x39.lightcycler.v1.ListExperimentsResponse.ExperimentSummaryR\x0b\x65xperiments\x1a\xab\x01\n\x11\x45xperimentSummary\x12\x12\n\x04guid\x18\x01 \x01(\tR\x04guid\x12\x38\n\x06status\x18\x02 \x01(\x0e\x32 .lightcycler.v1.ExperimentStatusR\x06status\x12\x1d\n\ncreated_at\x18\x03 \x01(\tR\tcreatedAt\x12)\n\x10num_acquisitions\x18\x04 \x01(\x05R\x0fnumAcquisitions\"\x11\n\x0fOpenDoorRequest\"B\n\x10OpenDoorResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x14\n\x05\x65rror\x18\x02 \x01(\tR\x05\x65rror\"\x12\n\x10\x43loseDoorRequest\"C\n\x11\x43loseDoorResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success\x12\x14\n\x05\x65rror\x18\x02 \x01(\tR\x05\x65rror\"\x16\n\x14GetDoorStatusRequest\"t\n\x15GetDoorStatusResponse\x12\'\n\x0f\x62\x61ttery_percent\x18\x01 \x01(\x05R\x0e\x62\x61tteryPercent\x12\x1c\n\tavailable\x18\x02 \x01(\x08R\tavailable\x12\x14\n\x05\x65rror\x18\x03 \x01(\tR\x05\x65rror*N\n\tFilterSet\x12\x16\n\x12\x46ILTER_UNSPECIFIED\x10\x00\x12\x0e\n\nSYBR_GREEN\x10\x01\x12\x07\n\x03HEX\x10\x02\x12\x07\n\x03ROX\x10\x03\x12\x07\n\x03\x43Y5\x10\x04*]\n\x10\x45xperimentStatus\x12\x16\n\x12STATUS_UNSPECIFIED\x10\x00\x12\x0b\n\x07PENDING\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\x0c\n\x08\x43OMPLETE\x10\x03\x12\t\n\x05\x45RROR\x10\x04\x32\xce\x05\n\x12LightCyclerService\x12M\n\x08GetState\x12\x1f.lightcycler.v1.GetStateRequest\x1a .lightcycler.v1.GetStateResponse\x12J\n\x07GetLogs\x12\x1e.lightcycler.v1.GetLogsRequest\x1a\x1f.lightcycler.v1.GetLogsResponse\x12\\\n\rRunExperiment\x12$.lightcycler.v1.RunExperimentRequest\x1a%.lightcycler.v1.RunExperimentResponse\x12\\\n\rGetExperiment\x12$.lightcycler.v1.GetExperimentRequest\x1a%.lightcycler.v1.GetExperimentResponse\x12\x62\n\x0fListExperiments\x12&.lightcycler.v1.ListExperimentsRequest\x1a\'.lightcycler.v1.ListExperimentsResponse\x12M\n\x08OpenDoor\x12\x1f.lightcycler.v1.OpenDoorRequest\x1a .lightcycler.v1.OpenDoorResponse\x12P\n\tCloseDoor\x12 .lightcycler.v1.CloseDoorRequest\x1a!.lightcycler.v1.CloseDoorResponse\x12\\\n\rGetDoorStatus\x12$.lightcycler.v1.GetDoorStatusRequest\x1a%.lightcycler.v1.GetDoorStatusResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'lightcycler_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_FILTERSET']._serialized_start=2074
-  _globals['_FILTERSET']._serialized_end=2152
-  _globals['_EXPERIMENTSTATUS']._serialized_start=2154
-  _globals['_EXPERIMENTSTATUS']._serialized_end=2247
+  _globals['_FILTERSET']._serialized_start=2368
+  _globals['_FILTERSET']._serialized_end=2446
+  _globals['_EXPERIMENTSTATUS']._serialized_start=2448
+  _globals['_EXPERIMENTSTATUS']._serialized_end=2541
   _globals['_GETSTATEREQUEST']._serialized_start=37
   _globals['_GETSTATEREQUEST']._serialized_end=54
   _globals['_GETSTATERESPONSE']._serialized_start=57
@@ -45,34 +45,38 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_LOGENTRY']._serialized_end=500
   _globals['_GETLOGSRESPONSE']._serialized_start=502
   _globals['_GETLOGSRESPONSE']._serialized_end=571
-  _globals['_RUNEXPERIMENTREQUEST']._serialized_start=574
-  _globals['_RUNEXPERIMENTREQUEST']._serialized_end=805
-  _globals['_RUNEXPERIMENTRESPONSE']._serialized_start=807
-  _globals['_RUNEXPERIMENTRESPONSE']._serialized_end=850
-  _globals['_GETEXPERIMENTREQUEST']._serialized_start=852
-  _globals['_GETEXPERIMENTREQUEST']._serialized_end=894
-  _globals['_ACQUISITION']._serialized_start=897
-  _globals['_ACQUISITION']._serialized_end=1077
-  _globals['_GETEXPERIMENTRESPONSE']._serialized_start=1080
-  _globals['_GETEXPERIMENTRESPONSE']._serialized_end=1411
-  _globals['_LISTEXPERIMENTSREQUEST']._serialized_start=1413
-  _globals['_LISTEXPERIMENTSREQUEST']._serialized_end=1459
-  _globals['_LISTEXPERIMENTSRESPONSE']._serialized_start=1462
-  _globals['_LISTEXPERIMENTSRESPONSE']._serialized_end=1754
-  _globals['_LISTEXPERIMENTSRESPONSE_EXPERIMENTSUMMARY']._serialized_start=1583
-  _globals['_LISTEXPERIMENTSRESPONSE_EXPERIMENTSUMMARY']._serialized_end=1754
-  _globals['_OPENDOORREQUEST']._serialized_start=1756
-  _globals['_OPENDOORREQUEST']._serialized_end=1773
-  _globals['_OPENDOORRESPONSE']._serialized_start=1775
-  _globals['_OPENDOORRESPONSE']._serialized_end=1841
-  _globals['_CLOSEDOORREQUEST']._serialized_start=1843
-  _globals['_CLOSEDOORREQUEST']._serialized_end=1861
-  _globals['_CLOSEDOORRESPONSE']._serialized_start=1863
-  _globals['_CLOSEDOORRESPONSE']._serialized_end=1930
-  _globals['_GETDOORSTATUSREQUEST']._serialized_start=1932
-  _globals['_GETDOORSTATUSREQUEST']._serialized_end=1954
-  _globals['_GETDOORSTATUSRESPONSE']._serialized_start=1956
-  _globals['_GETDOORSTATUSRESPONSE']._serialized_end=2072
-  _globals['_LIGHTCYCLERSERVICE']._serialized_start=2250
-  _globals['_LIGHTCYCLERSERVICE']._serialized_end=2968
+  _globals['_STEP']._serialized_start=574
+  _globals['_STEP']._serialized_end=757
+  _globals['_STAGE']._serialized_start=759
+  _globals['_STAGE']._serialized_end=836
+  _globals['_RUNEXPERIMENTREQUEST']._serialized_start=839
+  _globals['_RUNEXPERIMENTREQUEST']._serialized_end=968
+  _globals['_RUNEXPERIMENTRESPONSE']._serialized_start=970
+  _globals['_RUNEXPERIMENTRESPONSE']._serialized_end=1013
+  _globals['_GETEXPERIMENTREQUEST']._serialized_start=1015
+  _globals['_GETEXPERIMENTREQUEST']._serialized_end=1057
+  _globals['_ACQUISITION']._serialized_start=1060
+  _globals['_ACQUISITION']._serialized_end=1326
+  _globals['_GETEXPERIMENTRESPONSE']._serialized_start=1329
+  _globals['_GETEXPERIMENTRESPONSE']._serialized_end=1705
+  _globals['_LISTEXPERIMENTSREQUEST']._serialized_start=1707
+  _globals['_LISTEXPERIMENTSREQUEST']._serialized_end=1753
+  _globals['_LISTEXPERIMENTSRESPONSE']._serialized_start=1756
+  _globals['_LISTEXPERIMENTSRESPONSE']._serialized_end=2048
+  _globals['_LISTEXPERIMENTSRESPONSE_EXPERIMENTSUMMARY']._serialized_start=1877
+  _globals['_LISTEXPERIMENTSRESPONSE_EXPERIMENTSUMMARY']._serialized_end=2048
+  _globals['_OPENDOORREQUEST']._serialized_start=2050
+  _globals['_OPENDOORREQUEST']._serialized_end=2067
+  _globals['_OPENDOORRESPONSE']._serialized_start=2069
+  _globals['_OPENDOORRESPONSE']._serialized_end=2135
+  _globals['_CLOSEDOORREQUEST']._serialized_start=2137
+  _globals['_CLOSEDOORREQUEST']._serialized_end=2155
+  _globals['_CLOSEDOORRESPONSE']._serialized_start=2157
+  _globals['_CLOSEDOORRESPONSE']._serialized_end=2224
+  _globals['_GETDOORSTATUSREQUEST']._serialized_start=2226
+  _globals['_GETDOORSTATUSREQUEST']._serialized_end=2248
+  _globals['_GETDOORSTATUSRESPONSE']._serialized_start=2250
+  _globals['_GETDOORSTATUSRESPONSE']._serialized_end=2366
+  _globals['_LIGHTCYCLERSERVICE']._serialized_start=2544
+  _globals['_LIGHTCYCLERSERVICE']._serialized_end=3262
 # @@protoc_insertion_point(module_scope)

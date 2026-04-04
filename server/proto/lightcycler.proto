@@ -3,6 +3,12 @@ syntax = "proto3";
 package lightcycler.v1;
 
 // LightCyclerService controls a Roche LightCycler 480 II qPCR instrument.
+//
+// The experiment data model follows pylabrobot's Protocol/Stage/Step pattern:
+//   Protocol (RunExperimentRequest) → Stages → Steps
+//
+// Each Step defines a temperature + hold time. Steps with acquire=true
+// trigger a fluorescence plate read at that temperature.
 service LightCyclerService {
   // Machine state and logs
   rpc GetState(GetStateRequest) returns (GetStateResponse);
@@ -13,9 +19,8 @@ service LightCyclerService {
   rpc GetExperiment(GetExperimentRequest) returns (GetExperimentResponse);
   rpc ListExperiments(ListExperimentsRequest) returns (ListExperimentsResponse);
 
-  // Door control (SwitchBot Fingerbot)
-  rpc OpenDoor(OpenDoorRequest) returns (OpenDoorResponse);
-  rpc CloseDoor(CloseDoorRequest) returns (CloseDoorResponse);
+  // Door control (SwitchBot Fingerbot — press mode)
+  rpc PressDoor(PressDoorRequest) returns (PressDoorResponse);
   rpc GetDoorStatus(GetDoorStatusRequest) returns (GetDoorStatusResponse);
 }
 
@@ -68,13 +73,42 @@ enum ExperimentStatus {
   ERROR = 4;
 }
 
+// A single thermal step: hold at a temperature, optionally read fluorescence.
+// Mirrors pylabrobot's thermocycling.standard.Step.
+message Step {
+  double temperature_c = 1;    // target temperature in Celsius
+  double hold_seconds = 2;     // hold time at temperature
+  bool acquire = 3;            // if true, take a fluorescence plate read
+  FilterSet filter = 4;        // filter set (only used when acquire=true)
+  int32 exposure = 5;          // exposure value in firmware units (default 4800)
+}
+
+// A group of steps repeated N times (one thermal cycle).
+// Mirrors pylabrobot's thermocycling.standard.Stage.
+message Stage {
+  repeated Step steps = 1;
+  int32 repeats = 2;           // number of times to repeat this stage (default 1)
+}
+
+// Run an experiment defined as a list of stages.
+//
+// Example: 3 fluorescence reads at 37°C with 1s hold
+//   stages: [{ steps: [{ temperature_c: 37, hold_seconds: 1, acquire: true }], repeats: 3 }]
+//
+// Example: 30-cycle qPCR with SYBR Green read during annealing
+//   stages: [
+//     { steps: [{ temperature_c: 95, hold_seconds: 120 }], repeats: 1 },
+//     { steps: [
+//         { temperature_c: 95, hold_seconds: 30 },
+//         { temperature_c: 55, hold_seconds: 30, acquire: true, filter: SYBR_GREEN },
+//         { temperature_c: 72, hold_seconds: 60 },
+//       ], repeats: 30 },
+//     { steps: [{ temperature_c: 72, hold_seconds: 300 }], repeats: 1 },
+//   ]
 message RunExperimentRequest {
-  double temp_c = 1;          // target temperature (default 37.0)
-  double hold_time_s = 2;     // hold time per read in seconds (default 1.0)
-  int32 num_acquisitions = 3; // number of plate reads (default 3)
-  FilterSet filter = 4;       // filter set (default SYBR_GREEN)
-  int32 well_count = 5;       // 96 or 384 (default 384)
-  int32 volume_ul = 6;        // reaction volume in uL (default 20)
+  repeated Stage stages = 1;
+  int32 well_count = 2;        // 96 or 384 (default 384)
+  int32 volume_ul = 3;         // reaction volume in uL (default 20)
 }
 
 message RunExperimentResponse {
@@ -87,20 +121,25 @@ message GetExperimentRequest {
 
 message Acquisition {
   int32 acquisition_num = 1;
-  double temperature_c = 2;
-  double time_s = 3;
-  int32 ref_channel = 4;
-  repeated int32 well_values = 5;  // fluorescence per well
+  int32 stage_index = 2;       // which stage this read came from (0-indexed)
+  int32 step_index = 3;        // which step within the stage (0-indexed)
+  int32 cycle = 4;             // which cycle of the stage (1-indexed)
+  double temperature_c = 5;
+  double time_s = 6;
+  int32 ref_channel = 7;
+  repeated int32 well_values = 8;  // fluorescence per well
 }
 
 message GetExperimentResponse {
   string guid = 1;
   ExperimentStatus status = 2;
-  RunExperimentRequest config = 3;
-  string created_at = 4;
-  string completed_at = 5;
-  string error_message = 6;
-  repeated Acquisition acquisitions = 7;
+  repeated Stage stages = 3;   // the protocol that was run
+  int32 well_count = 4;
+  int32 volume_ul = 5;
+  string created_at = 6;
+  string completed_at = 7;
+  string error_message = 8;
+  repeated Acquisition acquisitions = 9;
 }
 
 message ListExperimentsRequest {
@@ -119,14 +158,8 @@ message ListExperimentsResponse {
 
 // --- Door control ---
 
-message OpenDoorRequest {}
-message OpenDoorResponse {
-  bool success = 1;
-  string error = 2;
-}
-
-message CloseDoorRequest {}
-message CloseDoorResponse {
+message PressDoorRequest {}
+message PressDoorResponse {
   bool success = 1;
   string error = 2;
 }

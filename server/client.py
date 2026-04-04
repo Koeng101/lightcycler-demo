@@ -4,11 +4,12 @@
 Usage:
     python client.py state
     python client.py logs [--limit 50] [--since 0]
-    python client.py run [--temp 37] [--hold 1] [--acquisitions 3]
+    python client.py run [--temp 37] [--hold 1] [--reads 3]
+    python client.py pcr [--cycles 30] [--denature-temp 95] [--anneal-temp 55]
     python client.py experiment <GUID>
     python client.py experiments
     python client.py door open|close|status
-    python client.py scan  (BLE scan for SwitchBot devices)
+    python client.py scan
 """
 from __future__ import annotations
 
@@ -51,16 +52,60 @@ def cmd_logs(client: LightCyclerServiceClientSync, args):
 
 
 def cmd_run(client: LightCyclerServiceClientSync, args):
+    """Simple isothermal read: N reads at a fixed temperature."""
     filter_map = {'sybr': 1, 'hex': 2, 'rox': 3, 'cy5': 4}
-    resp = client.run_experiment(pb.RunExperimentRequest(
-        temp_c=args.temp,
-        hold_time_s=args.hold,
-        num_acquisitions=args.acquisitions,
-        filter=filter_map.get(args.filter, 1),
+    req = pb.RunExperimentRequest(
+        stages=[pb.Stage(
+            steps=[pb.Step(
+                temperature_c=args.temp,
+                hold_seconds=args.hold,
+                acquire=True,
+                filter=filter_map.get(args.filter, 1),
+            )],
+            repeats=args.reads,
+        )],
         well_count=args.wells,
         volume_ul=args.volume,
-    ))
+    )
+    resp = client.run_experiment(req)
     print(f"Experiment submitted: {resp.guid}")
+    print(f"Poll with: python client.py experiment {resp.guid}")
+
+
+def cmd_pcr(client: LightCyclerServiceClientSync, args):
+    """Standard 3-step PCR protocol."""
+    filter_map = {'sybr': 1, 'hex': 2, 'rox': 3, 'cy5': 4}
+    req = pb.RunExperimentRequest(
+        stages=[
+            # Initial denature
+            pb.Stage(steps=[pb.Step(
+                temperature_c=args.denature_temp,
+                hold_seconds=args.initial_denature,
+            )], repeats=1),
+            # Cycling
+            pb.Stage(steps=[
+                pb.Step(temperature_c=args.denature_temp,
+                        hold_seconds=args.denature_hold),
+                pb.Step(temperature_c=args.anneal_temp,
+                        hold_seconds=args.anneal_hold,
+                        acquire=True,
+                        filter=filter_map.get(args.filter, 1)),
+                pb.Step(temperature_c=args.extend_temp,
+                        hold_seconds=args.extend_hold),
+            ], repeats=args.cycles),
+            # Final extension
+            pb.Stage(steps=[pb.Step(
+                temperature_c=args.extend_temp,
+                hold_seconds=args.final_extend,
+            )], repeats=1),
+        ],
+        well_count=args.wells,
+        volume_ul=args.volume,
+    )
+    resp = client.run_experiment(req)
+    print(f"PCR experiment submitted: {resp.guid}")
+    print(f"  {args.cycles} cycles: {args.denature_temp}°C/{args.anneal_temp}°C/{args.extend_temp}°C")
+    print(f"  Read at {args.anneal_temp}°C (annealing)")
     print(f"Poll with: python client.py experiment {resp.guid}")
 
 
@@ -74,15 +119,20 @@ def cmd_experiment(client: LightCyclerServiceClientSync, args):
         print(f"Completed:  {resp.completed_at}")
     if resp.error_message:
         print(f"Error:      {resp.error_message}")
-    if resp.config:
-        print(f"Config:     {resp.config.temp_c}°C, {resp.config.hold_time_s}s hold, "
-              f"{resp.config.num_acquisitions} acq, {resp.config.well_count} wells")
+    print(f"Wells:      {resp.well_count}")
+    print(f"Protocol:   {len(resp.stages)} stage(s)")
+    for i, stage in enumerate(resp.stages):
+        acq_steps = sum(1 for s in stage.steps if s.acquire)
+        temps = [f"{s.temperature_c}°C" for s in stage.steps]
+        print(f"  Stage {i}: {' → '.join(temps)} × {stage.repeats}"
+              + (f" ({acq_steps} read/cycle)" if acq_steps else ""))
     for acq in resp.acquisitions:
         vals = list(acq.well_values)
         mean = sum(vals) / len(vals) if vals else 0
-        print(f"  Acq {acq.acquisition_num}: T={acq.temperature_c:.2f}°C "
-              f"t={acq.time_s:.1f}s mean={mean:.1f} ref={acq.ref_channel} "
-              f"wells={len(vals)}")
+        print(f"  Acq {acq.acquisition_num}: stage={acq.stage_index} "
+              f"step={acq.step_index} cycle={acq.cycle} "
+              f"T={acq.temperature_c:.2f}°C t={acq.time_s:.1f}s "
+              f"mean={mean:.1f} wells={len(vals)}")
 
 
 def cmd_experiments(client: LightCyclerServiceClientSync, args):
@@ -112,29 +162,10 @@ def cmd_door(client: LightCyclerServiceClientSync, args):
             print(f"Error:     {resp.error}")
 
 
-def cmd_scan(client, args):
-    """BLE scan for nearby SwitchBot devices."""
-    async def _scan():
-        from bleak import BleakScanner
-        print("Scanning for BLE devices (10s)...")
-        devices = await BleakScanner.discover(timeout=10)
-        switchbot_devices = [d for d in devices
-                             if d.name and 'switchbot' in d.name.lower()
-                             or (d.name and 'bot' in d.name.lower())]
-        if switchbot_devices:
-            for d in switchbot_devices:
-                print(f"  {d.address}  {d.name}  rssi={d.rssi}")
-        else:
-            print("No SwitchBot devices found. All BLE devices:")
-            for d in sorted(devices, key=lambda d: d.rssi or -100, reverse=True)[:20]:
-                print(f"  {d.address}  {d.name or '(unknown)'}  rssi={d.rssi}")
-    asyncio.run(_scan())
-
 
 def main():
     parser = argparse.ArgumentParser(description='LightCycler RPC Client')
-    parser.add_argument('--url', default='http://localhost:8080',
-                        help='Server URL')
+    parser.add_argument('--url', default='http://localhost:8080', help='Server URL')
     sub = parser.add_subparsers(dest='command', required=True)
 
     sub.add_parser('state', help='Get instrument state')
@@ -143,13 +174,29 @@ def main():
     p_logs.add_argument('--limit', type=int, default=50)
     p_logs.add_argument('--since', type=int, default=0)
 
-    p_run = sub.add_parser('run', help='Run experiment')
-    p_run.add_argument('--temp', type=float, default=37.0)
-    p_run.add_argument('--hold', type=float, default=1.0)
-    p_run.add_argument('--acquisitions', type=int, default=3)
+    # Simple isothermal read
+    p_run = sub.add_parser('run', help='Simple fluorescence read')
+    p_run.add_argument('--temp', type=float, default=37.0, help='Temperature (°C)')
+    p_run.add_argument('--hold', type=float, default=1.0, help='Hold time (s)')
+    p_run.add_argument('--reads', type=int, default=3, help='Number of plate reads')
     p_run.add_argument('--filter', default='sybr', choices=['sybr', 'hex', 'rox', 'cy5'])
     p_run.add_argument('--wells', type=int, default=384, choices=[96, 384])
     p_run.add_argument('--volume', type=int, default=20)
+
+    # PCR protocol
+    p_pcr = sub.add_parser('pcr', help='Run PCR protocol')
+    p_pcr.add_argument('--cycles', type=int, default=30)
+    p_pcr.add_argument('--denature-temp', type=float, default=95.0)
+    p_pcr.add_argument('--denature-hold', type=float, default=30.0)
+    p_pcr.add_argument('--anneal-temp', type=float, default=55.0)
+    p_pcr.add_argument('--anneal-hold', type=float, default=30.0)
+    p_pcr.add_argument('--extend-temp', type=float, default=72.0)
+    p_pcr.add_argument('--extend-hold', type=float, default=60.0)
+    p_pcr.add_argument('--initial-denature', type=float, default=120.0)
+    p_pcr.add_argument('--final-extend', type=float, default=300.0)
+    p_pcr.add_argument('--filter', default='sybr', choices=['sybr', 'hex', 'rox', 'cy5'])
+    p_pcr.add_argument('--wells', type=int, default=384, choices=[96, 384])
+    p_pcr.add_argument('--volume', type=int, default=20)
 
     p_exp = sub.add_parser('experiment', help='Get experiment by GUID')
     p_exp.add_argument('guid')
@@ -160,15 +207,15 @@ def main():
     p_door = sub.add_parser('door', help='Door control')
     p_door.add_argument('action', choices=['open', 'close', 'status'])
 
-    sub.add_parser('scan', help='BLE scan for SwitchBot devices')
 
     args = parser.parse_args()
     client = get_client(args.url)
 
     cmds = {
         'state': cmd_state, 'logs': cmd_logs, 'run': cmd_run,
+        'pcr': cmd_pcr,
         'experiment': cmd_experiment, 'experiments': cmd_experiments,
-        'door': cmd_door, 'scan': cmd_scan,
+        'door': cmd_door,
     }
     cmds[args.command](client, args)
 

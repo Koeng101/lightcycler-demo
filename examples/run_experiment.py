@@ -25,7 +25,7 @@ from lightcycler import (
     MSG_STATUS_QUERY, MSG_QUERY_LOAD_STATE, MSG_SET_PARAMETER,
     MSG_GET_RESULT_DATA, MSG_ACK_RESULT, MSG_QUERY_RESULT_INFO,
 )
-from experiment import ExperimentConfig, Program, Acquisition, build_commands
+from experiment import ExperimentConfig, Stage, Step, build_commands, simple_read
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ def run_experiment(conn: LightCyclerConnection,
       6. Post-run cleanup
     """
     commands = build_commands(config)
-    num_acq = sum(len(p.acquisitions) for p in config.programs)
+    num_acq = config.total_acquisitions()
 
     if skip_init:
         # Drain any buffered historical events (give them time to arrive)
@@ -251,20 +251,13 @@ def main():
     )
 
     # Build experiment config
-    config = ExperimentConfig(
+    config = simple_read(
+        temp_c=args.temp,
+        hold_seconds=args.hold,
+        num_reads=args.acquisitions,
+        filter_set=FILTER_MAP[args.filter],
         well_count=args.wells,
         volume=args.volume,
-        programs=[Program(
-            cycles=args.cycles,
-            acquisitions=[
-                Acquisition(
-                    target_temp=args.temp,
-                    hold_time=args.hold,
-                    filter_set=FILTER_MAP[args.filter],
-                )
-                for _ in range(args.acquisitions)
-            ],
-        )],
     )
 
     log.info("Experiment: %.1f C, %.1fs hold, %d acquisitions, "

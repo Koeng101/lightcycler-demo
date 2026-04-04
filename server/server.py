@@ -34,7 +34,7 @@ from lightcycler import (
     MSG_QUERY_LOAD_STATE, MSG_SET_PARAMETER,
     MSG_GET_RESULT_DATA, MSG_ACK_RESULT, MSG_QUERY_RESULT_INFO,
 )
-from experiment import ExperimentConfig, Program, Acquisition, build_commands
+from experiment import ExperimentConfig, Stage, Step, build_commands
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +49,67 @@ def init_db(path: str) -> sqlite3.Connection:
     with open(schema_path) as f:
         db.executescript(f.read())
     return db
+
+
+# ---------------------------------------------------------------------------
+# Proto ↔ dataclass conversion
+# ---------------------------------------------------------------------------
+
+def proto_to_config(req: pb.RunExperimentRequest) -> ExperimentConfig:
+    """Convert a RunExperimentRequest proto to an ExperimentConfig."""
+    stages = []
+    for pb_stage in req.stages:
+        steps = []
+        for pb_step in pb_stage.steps:
+            steps.append(Step(
+                temperature_c=pb_step.temperature_c or 37.0,
+                hold_seconds=pb_step.hold_seconds or 1.0,
+                acquire=pb_step.acquire,
+                filter_set=pb_step.filter or 1,
+                exposure=pb_step.exposure or 4800,
+            ))
+        stages.append(Stage(steps=steps, repeats=pb_stage.repeats or 1))
+    return ExperimentConfig(
+        well_count=req.well_count or 384,
+        volume=req.volume_ul or 20,
+        stages=stages,
+    )
+
+
+def config_to_json(config: ExperimentConfig) -> str:
+    """Serialize an ExperimentConfig to JSON for DB storage."""
+    return json.dumps({
+        'well_count': config.well_count,
+        'volume': config.volume,
+        'stages': [{
+            'repeats': stage.repeats,
+            'steps': [{
+                'temperature_c': step.temperature_c,
+                'hold_seconds': step.hold_seconds,
+                'acquire': step.acquire,
+                'filter_set': step.filter_set,
+                'exposure': step.exposure,
+            } for step in stage.steps],
+        } for stage in config.stages],
+    })
+
+
+def json_to_proto_stages(config_json: str) -> tuple[list[pb.Stage], int, int]:
+    """Deserialize JSON config to proto stages + well_count + volume."""
+    config = json.loads(config_json)
+    stages = []
+    for s in config.get('stages', []):
+        steps = []
+        for st in s.get('steps', []):
+            steps.append(pb.Step(
+                temperature_c=st['temperature_c'],
+                hold_seconds=st['hold_seconds'],
+                acquire=st.get('acquire', False),
+                filter=st.get('filter_set', 0),
+                exposure=st.get('exposure', 4800),
+            ))
+        stages.append(pb.Stage(steps=steps, repeats=s.get('repeats', 1)))
+    return stages, config.get('well_count', 384), config.get('volume', 20)
 
 
 # ---------------------------------------------------------------------------
@@ -82,7 +143,6 @@ class LightCyclerManager:
         self.conn = LightCyclerConnection(self.host, self.port)
         self.conn.connect()
 
-        # Start event logger thread
         threading.Thread(target=self._event_logger, daemon=True).start()
         log.info("LightCycler connected, event logger started")
 
@@ -111,40 +171,16 @@ class LightCyclerManager:
             'current_experiment_guid': self._current_guid,
         }
 
-    def run_experiment(self, temp_c: float, hold_time_s: float,
-                       num_acquisitions: int, filter_set: int,
-                       well_count: int, volume_ul: int) -> str:
+    def run_experiment(self, config: ExperimentConfig) -> str:
         with self._running_lock:
             if self._current_guid:
                 raise RuntimeError(f"Experiment {self._current_guid} already running")
 
-        config = ExperimentConfig(
-            well_count=well_count,
-            volume=volume_ul,
-            programs=[Program(
-                cycles=1,
-                acquisitions=[
-                    Acquisition(
-                        target_temp=temp_c,
-                        hold_time=hold_time_s,
-                        filter_set=filter_set,
-                    )
-                    for _ in range(num_acquisitions)
-                ],
-            )],
-        )
-
-        # Store in DB
         now = datetime.now(timezone.utc).isoformat()
-        config_json = json.dumps({
-            'temp_c': temp_c, 'hold_time_s': hold_time_s,
-            'num_acquisitions': num_acquisitions, 'filter_set': filter_set,
-            'well_count': well_count, 'volume_ul': volume_ul,
-        })
         with self._db_lock:
             self.db.execute(
                 'INSERT INTO experiments (guid, status, config, created_at) VALUES (?, ?, ?, ?)',
-                (config.guid, 'pending', config_json, now))
+                (config.guid, 'pending', config_to_json(config), now))
             self.db.commit()
 
         self._current_guid = config.guid
@@ -157,7 +193,7 @@ class LightCyclerManager:
         try:
             self._update_experiment(guid, 'running')
             commands = build_commands(config)
-            num_acq = sum(len(p.acquisitions) for p in config.programs)
+            total_acq = config.total_acquisitions()
 
             # Drain buffered events
             time.sleep(2)
@@ -184,28 +220,39 @@ class LightCyclerManager:
                 timeout=120)
 
             # Collect acquisitions
-            for i in range(1, num_acq + 1):
+            # Track which stage/step/cycle each acquisition belongs to
+            acq_metadata = []
+            for stage_idx, stage in enumerate(config.stages):
+                for cycle in range(1, stage.repeats + 1):
+                    for step_idx, step in enumerate(stage.steps):
+                        if step.acquire:
+                            acq_metadata.append((stage_idx, step_idx, cycle))
+
+            for i in range(1, total_acq + 1):
                 self.conn.wait_for_event(
-                    lambda f: len(f) > 2 and f[2] == '201', timeout=60)
+                    lambda f: len(f) > 2 and f[2] == '201', timeout=120)
                 resp = self.conn.command(
                     MSG_GET_RESULT_DATA, f"{i}\n".encode('ascii'))
                 result = ResultData(resp.fields)
                 self.conn.query(MSG_QUERY_RESULT_INFO)
                 self.conn.command(MSG_ACK_RESULT, str(i).encode('ascii'))
 
+                stage_idx, step_idx, cycle = acq_metadata[i - 1] if i <= len(acq_metadata) else (0, 0, i)
+
                 now = datetime.now(timezone.utc).isoformat()
                 with self._db_lock:
                     self.db.execute(
                         'INSERT INTO acquisitions (experiment_guid, acquisition_num, '
+                        'stage_index, step_index, cycle, '
                         'temperature_c, time_s, ref_channel, well_data, created_at) '
-                        'VALUES (?, ?, ?, ?, ?, ?, ?)',
-                        (guid, result.acquisition, result.temperature,
-                         result.time_seconds, result.ref_channel,
+                        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        (guid, result.acquisition, stage_idx, step_idx, cycle,
+                         result.temperature, result.time_seconds, result.ref_channel,
                          json.dumps(result.values), now))
                     self.db.commit()
-                log.info("Acq %d/%d: T=%.2f°C mean=%.1f",
-                         i, num_acq, result.temperature,
-                         sum(result.values) / len(result.values))
+                log.info("Acq %d/%d (stage %d, step %d, cycle %d): T=%.2f°C mean=%.1f",
+                         i, total_acq, stage_idx, step_idx, cycle,
+                         result.temperature, sum(result.values) / len(result.values))
 
             # Wait for completion
             self.conn.wait_for_event(
@@ -236,7 +283,6 @@ class LightCyclerManager:
             self.db.commit()
 
     def _event_logger(self):
-        """Background thread that logs events to SQLite."""
         while self.conn and self.conn._running:
             with self.conn._events_lock:
                 events = list(self.conn._events)
@@ -261,8 +307,6 @@ class LightCyclerManager:
 # ---------------------------------------------------------------------------
 
 class DoorController:
-    """Controls a SwitchBot Fingerbot via BLE."""
-
     def __init__(self, mac: str | None = None):
         self.mac = mac
         self._device = None
@@ -271,27 +315,18 @@ class DoorController:
         if not self.mac:
             raise RuntimeError("No Fingerbot MAC configured (--fingerbot-mac or FINGERBOT_MAC)")
         if self._device is None:
-            from switchbot import SwitchbotDevice
             from bleak import BleakScanner
             ble_device = await BleakScanner.find_device_by_address(self.mac, timeout=10)
             if not ble_device:
                 raise RuntimeError(f"Fingerbot {self.mac} not found via BLE")
-            from switchbot.devices.bot import SwitchbotBot
-            self._device = SwitchbotBot(ble_device)
+            from switchbot.devices.bot import Switchbot
+            self._device = Switchbot(ble_device)
         return self._device
 
-    async def open(self) -> tuple[bool, str]:
+    async def press(self) -> tuple[bool, str]:
         try:
             dev = await self._get_device()
             await dev.turn_on()
-            return True, ''
-        except Exception as e:
-            return False, str(e)
-
-    async def close(self) -> tuple[bool, str]:
-        try:
-            dev = await self._get_device()
-            await dev.turn_off()
             return True, ''
         except Exception as e:
             return False, str(e)
@@ -313,8 +348,6 @@ class DoorController:
 # ---------------------------------------------------------------------------
 
 class LightCyclerServiceImpl:
-    """Connect RPC service implementation."""
-
     def __init__(self, manager: LightCyclerManager, door: DoorController,
                  db: sqlite3.Connection):
         self.manager = manager
@@ -351,14 +384,8 @@ class LightCyclerServiceImpl:
 
     async def run_experiment(self, request: pb.RunExperimentRequest,
                              ctx: RequestContext) -> pb.RunExperimentResponse:
-        guid = self.manager.run_experiment(
-            temp_c=request.temp_c or 37.0,
-            hold_time_s=request.hold_time_s or 1.0,
-            num_acquisitions=request.num_acquisitions or 3,
-            filter_set=request.filter or 1,
-            well_count=request.well_count or 384,
-            volume_ul=request.volume_ul or 20,
-        )
+        config = proto_to_config(request)
+        guid = self.manager.run_experiment(config)
         return pb.RunExperimentResponse(guid=guid)
 
     async def get_experiment(self, request: pb.GetExperimentRequest,
@@ -372,9 +399,10 @@ class LightCyclerServiceImpl:
             from connectrpc.code import Code
             raise ConnectError(Code.NOT_FOUND, f"Experiment {request.guid} not found")
 
-        config = json.loads(row['config'])
         status_map = {'pending': pb.PENDING, 'running': pb.RUNNING,
                       'complete': pb.COMPLETE, 'error': pb.ERROR}
+
+        stages, well_count, volume = json_to_proto_stages(row['config'])
 
         with self._db_lock:
             acq_rows = self.db.execute(
@@ -385,6 +413,9 @@ class LightCyclerServiceImpl:
         for ar in acq_rows:
             acquisitions.append(pb.Acquisition(
                 acquisition_num=ar['acquisition_num'],
+                stage_index=ar['stage_index'] if 'stage_index' in ar.keys() else 0,
+                step_index=ar['step_index'] if 'step_index' in ar.keys() else 0,
+                cycle=ar['cycle'] if 'cycle' in ar.keys() else 0,
                 temperature_c=ar['temperature_c'] or 0,
                 time_s=ar['time_s'] or 0,
                 ref_channel=ar['ref_channel'] or 0,
@@ -394,14 +425,9 @@ class LightCyclerServiceImpl:
         return pb.GetExperimentResponse(
             guid=row['guid'],
             status=status_map.get(row['status'], pb.STATUS_UNSPECIFIED),
-            config=pb.RunExperimentRequest(
-                temp_c=config.get('temp_c', 37.0),
-                hold_time_s=config.get('hold_time_s', 1.0),
-                num_acquisitions=config.get('num_acquisitions', 3),
-                filter=config.get('filter_set', 1),
-                well_count=config.get('well_count', 384),
-                volume_ul=config.get('volume_ul', 20),
-            ),
+            stages=stages,
+            well_count=well_count,
+            volume_ul=volume,
             created_at=row['created_at'] or '',
             completed_at=row['completed_at'] or '',
             error_message=row['error_message'] or '',

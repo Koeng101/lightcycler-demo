@@ -79,21 +79,37 @@ class GetLogsResponse(_message.Message):
     entries: _containers.RepeatedCompositeFieldContainer[LogEntry]
     def __init__(self, entries: _Optional[_Iterable[_Union[LogEntry, _Mapping]]] = ...) -> None: ...
 
-class RunExperimentRequest(_message.Message):
-    __slots__ = ("temp_c", "hold_time_s", "num_acquisitions", "filter", "well_count", "volume_ul")
-    TEMP_C_FIELD_NUMBER: _ClassVar[int]
-    HOLD_TIME_S_FIELD_NUMBER: _ClassVar[int]
-    NUM_ACQUISITIONS_FIELD_NUMBER: _ClassVar[int]
+class Step(_message.Message):
+    __slots__ = ("temperature_c", "hold_seconds", "acquire", "filter", "exposure")
+    TEMPERATURE_C_FIELD_NUMBER: _ClassVar[int]
+    HOLD_SECONDS_FIELD_NUMBER: _ClassVar[int]
+    ACQUIRE_FIELD_NUMBER: _ClassVar[int]
     FILTER_FIELD_NUMBER: _ClassVar[int]
+    EXPOSURE_FIELD_NUMBER: _ClassVar[int]
+    temperature_c: float
+    hold_seconds: float
+    acquire: bool
+    filter: FilterSet
+    exposure: int
+    def __init__(self, temperature_c: _Optional[float] = ..., hold_seconds: _Optional[float] = ..., acquire: _Optional[bool] = ..., filter: _Optional[_Union[FilterSet, str]] = ..., exposure: _Optional[int] = ...) -> None: ...
+
+class Stage(_message.Message):
+    __slots__ = ("steps", "repeats")
+    STEPS_FIELD_NUMBER: _ClassVar[int]
+    REPEATS_FIELD_NUMBER: _ClassVar[int]
+    steps: _containers.RepeatedCompositeFieldContainer[Step]
+    repeats: int
+    def __init__(self, steps: _Optional[_Iterable[_Union[Step, _Mapping]]] = ..., repeats: _Optional[int] = ...) -> None: ...
+
+class RunExperimentRequest(_message.Message):
+    __slots__ = ("stages", "well_count", "volume_ul")
+    STAGES_FIELD_NUMBER: _ClassVar[int]
     WELL_COUNT_FIELD_NUMBER: _ClassVar[int]
     VOLUME_UL_FIELD_NUMBER: _ClassVar[int]
-    temp_c: float
-    hold_time_s: float
-    num_acquisitions: int
-    filter: FilterSet
+    stages: _containers.RepeatedCompositeFieldContainer[Stage]
     well_count: int
     volume_ul: int
-    def __init__(self, temp_c: _Optional[float] = ..., hold_time_s: _Optional[float] = ..., num_acquisitions: _Optional[int] = ..., filter: _Optional[_Union[FilterSet, str]] = ..., well_count: _Optional[int] = ..., volume_ul: _Optional[int] = ...) -> None: ...
+    def __init__(self, stages: _Optional[_Iterable[_Union[Stage, _Mapping]]] = ..., well_count: _Optional[int] = ..., volume_ul: _Optional[int] = ...) -> None: ...
 
 class RunExperimentResponse(_message.Message):
     __slots__ = ("guid",)
@@ -108,36 +124,46 @@ class GetExperimentRequest(_message.Message):
     def __init__(self, guid: _Optional[str] = ...) -> None: ...
 
 class Acquisition(_message.Message):
-    __slots__ = ("acquisition_num", "temperature_c", "time_s", "ref_channel", "well_values")
+    __slots__ = ("acquisition_num", "stage_index", "step_index", "cycle", "temperature_c", "time_s", "ref_channel", "well_values")
     ACQUISITION_NUM_FIELD_NUMBER: _ClassVar[int]
+    STAGE_INDEX_FIELD_NUMBER: _ClassVar[int]
+    STEP_INDEX_FIELD_NUMBER: _ClassVar[int]
+    CYCLE_FIELD_NUMBER: _ClassVar[int]
     TEMPERATURE_C_FIELD_NUMBER: _ClassVar[int]
     TIME_S_FIELD_NUMBER: _ClassVar[int]
     REF_CHANNEL_FIELD_NUMBER: _ClassVar[int]
     WELL_VALUES_FIELD_NUMBER: _ClassVar[int]
     acquisition_num: int
+    stage_index: int
+    step_index: int
+    cycle: int
     temperature_c: float
     time_s: float
     ref_channel: int
     well_values: _containers.RepeatedScalarFieldContainer[int]
-    def __init__(self, acquisition_num: _Optional[int] = ..., temperature_c: _Optional[float] = ..., time_s: _Optional[float] = ..., ref_channel: _Optional[int] = ..., well_values: _Optional[_Iterable[int]] = ...) -> None: ...
+    def __init__(self, acquisition_num: _Optional[int] = ..., stage_index: _Optional[int] = ..., step_index: _Optional[int] = ..., cycle: _Optional[int] = ..., temperature_c: _Optional[float] = ..., time_s: _Optional[float] = ..., ref_channel: _Optional[int] = ..., well_values: _Optional[_Iterable[int]] = ...) -> None: ...
 
 class GetExperimentResponse(_message.Message):
-    __slots__ = ("guid", "status", "config", "created_at", "completed_at", "error_message", "acquisitions")
+    __slots__ = ("guid", "status", "stages", "well_count", "volume_ul", "created_at", "completed_at", "error_message", "acquisitions")
     GUID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    STAGES_FIELD_NUMBER: _ClassVar[int]
+    WELL_COUNT_FIELD_NUMBER: _ClassVar[int]
+    VOLUME_UL_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     COMPLETED_AT_FIELD_NUMBER: _ClassVar[int]
     ERROR_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ACQUISITIONS_FIELD_NUMBER: _ClassVar[int]
     guid: str
     status: ExperimentStatus
-    config: RunExperimentRequest
+    stages: _containers.RepeatedCompositeFieldContainer[Stage]
+    well_count: int
+    volume_ul: int
     created_at: str
     completed_at: str
     error_message: str
     acquisitions: _containers.RepeatedCompositeFieldContainer[Acquisition]
-    def __init__(self, guid: _Optional[str] = ..., status: _Optional[_Union[ExperimentStatus, str]] = ..., config: _Optional[_Union[RunExperimentRequest, _Mapping]] = ..., created_at: _Optional[str] = ..., completed_at: _Optional[str] = ..., error_message: _Optional[str] = ..., acquisitions: _Optional[_Iterable[_Union[Acquisition, _Mapping]]] = ...) -> None: ...
+    def __init__(self, guid: _Optional[str] = ..., status: _Optional[_Union[ExperimentStatus, str]] = ..., stages: _Optional[_Iterable[_Union[Stage, _Mapping]]] = ..., well_count: _Optional[int] = ..., volume_ul: _Optional[int] = ..., created_at: _Optional[str] = ..., completed_at: _Optional[str] = ..., error_message: _Optional[str] = ..., acquisitions: _Optional[_Iterable[_Union[Acquisition, _Mapping]]] = ...) -> None: ...
 
 class ListExperimentsRequest(_message.Message):
     __slots__ = ("limit",)

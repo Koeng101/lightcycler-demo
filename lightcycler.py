@@ -77,54 +77,71 @@ Sequence numbers auto-increment starting from 1 for each experiment.
 EXPERIMENT DEFINITION (port 5102)
 ================================================================================
 
-Commands are sent in this exact order:
+An experiment is a sequence of protocol steps, each defining a target
+temperature. The machine executes steps sequentially: ramp to temp, hold,
+read fluorescence, then move to the next step.
 
     CreateExperiment (0x012D)
-    ├── DefineProgram (0x012F)
-    │   ├── StepParameters (0x0131)     ← thermal profile
-    │   ├── AcquisitionPoint (0x0132)   ← read 1 (temp + filter + exposure)
-    │   ├── AcquisitionPoint (0x0132)   ← read 2 (repeat for triplicates)
-    │   ├── AcquisitionPoint (0x0132)   ← read 3
-    │   └── FinalizeProgram (0x0130)
-    ├── FinalizeExperiment (0x012E)
-    └── StartRun (0x00C9)
+    └── Program (0x012F)
+        ├── ThermalParams (0x0131)    ← shared hold/ramp for all steps
+        ├── ProtocolStep (0x0132)     ← step 1: temp + filter + exposure
+        ├── ProtocolStep (0x0132)     ← step 2: can be different temp
+        ├── ProtocolStep (0x0132)     ← step 3: ...
+        ├── FinalizeProgram (0x0130)
+        ├── FinalizeExperiment (0x012E)
+        └── StartRun (0x00C9)
 
-Field details:
+Each ProtocolStep (0x0132) IS a step in the protocol. It defines:
+  - The target temperature (the machine ramps to it)
+  - Filter and exposure settings for the fluorescence read
+  - Its own ramp rate
+
+ThermalParams (0x0131) sets SHARED parameters for all steps:
+  - Hold time at each temperature
+  - Detection mode (2 = read fluorescence)
+  - Ramp time
+
+Multiple programs per experiment ARE supported — set num_programs in
+CreateExperiment. Set filter=0 on a ProtocolStep for a thermal-only hold (no fluorescence
+read). Set filter=1-4 to read with a specific filter set. This allows PCR
+protocols with reads only at the annealing step.
+
+Field details (fields marked [?] have unknown meaning, keep default):
 
     CreateExperiment (0x012D):
-      seq, GUID (32-char hex), well_count (384|96), volume_uL (20), 1
+      seq, GUID (32-char hex), well_count (384|96), volume_uL (20), num_programs
 
     DefineProgram (0x012F):
-      seq, program_num (1), steps (1), mode (0), cycles, 1, num_acquisitions
+      seq, program_num (1..N), [?]=1, [?]=0, [?]=1, [?]=1, num_steps
 
-    StepParameters (0x0131):
-      seq, program_num, step (1), mode (0), ramp_time_ms (3000),
-      1, detection_mode (2), 1, hold_time_centisecs
+    ThermalParams (0x0131):
+      seq, program_num, [?]=1, [?]=0, ramp_time_ms (3000),
+      [?]=1, [?]=2, [?]=1, hold_time_centisecs
 
-    AcquisitionPoint (0x0132):
-      seq, program_num, acq_num (1..N), target_temp_centideg,
+    ProtocolStep (0x0132):
+      seq, program_num, step_num (1..N), target_temp_centideg,
       1, exposure (4800), ramp_rate_centideg_per_s, 0, 0, 0, filter_set
 
     FinalizeProgram (0x0130):  seq, "?"
     FinalizeExperiment (0x012E):  seq, "?"
     StartRun (0x00C9):  seq, "?"
 
-Example: 3 fluorescence reads at 37°C with 1s hold, SYBR Green filter:
+Example 1: 3 fluorescence reads at 37°C, 1s hold:
 
     CreateExperiment:   1, <GUID>, 384, 20, 1
-    DefineProgram:      2, 1, 1, 0, 1, 1, 3       ← 1 cycle, 3 acquisitions
-    StepParameters:     3, 1, 1, 0, 3000, 1, 2, 1, 100   ← 100 centisecs = 1s
-    AcquisitionPoint:   4, 1, 1, 3700, 1, 4800, 500, 0, 0, 0, 1   ← 37.00°C
-    AcquisitionPoint:   5, 1, 2, 3700, 1, 4800, 500, 0, 0, 0, 1   ← read 2
-    AcquisitionPoint:   6, 1, 3, 3700, 1, 4800, 500, 0, 0, 0, 1   ← read 3
-    FinalizeProgram:    7, ?
-    FinalizeExperiment: 8, ?
-    StartRun:           9, ?
+    DefineProgram:      2, 1, 1, 0, 1, 1, 3       ← 1 cycle, 3 steps
+    ThermalParams:      3, 1, 1, 0, 3000, 1, 2, 1, 100
+    ProtocolStep:       4, 1, 1, 3700, 1, 4800, 500, 0, 0, 0, 1   ← 37°C
+    ProtocolStep:       5, 1, 2, 3700, 1, 4800, 500, 0, 0, 0, 1   ← 37°C
+    ProtocolStep:       6, 1, 3, 3700, 1, 4800, 500, 0, 0, 0, 1   ← 37°C
 
-Each AcquisitionPoint is a separate full-plate read (all 384 wells) at a
-different time. Three identical AcquisitionPoints = triplicate reads for
-noise averaging. The CCD block assembly (3 physical image tiles per read)
-is handled internally by the firmware within each single acquisition.
+Example 2: read at 37°C then ramp to 50°C and read:
+
+    DefineProgram:      2, 1, 1, 0, 1, 1, 2       ← 1 cycle, 2 steps
+    ThermalParams:      3, 1, 1, 0, 3000, 1, 2, 1, 100
+    ProtocolStep:       4, 1, 1, 3700, ...         ← 37°C
+    ProtocolStep:       5, 1, 2, 5000, ...         ← 50°C
+    (confirmed: Acq1=36.96°C, Acq2=51.37°C)
 
 Units:
   - Temperature: centidegrees (3700 = 37.00°C)
@@ -208,8 +225,9 @@ MSG_CREATE_EXPERIMENT   = 0x012D
 MSG_FINALIZE_EXPERIMENT = 0x012E
 MSG_DEFINE_PROGRAM      = 0x012F
 MSG_FINALIZE_PROGRAM    = 0x0130
-MSG_STEP_PARAMETERS     = 0x0131
-MSG_ACQUISITION_POINT   = 0x0132
+MSG_THERMAL_PARAMS     = 0x0131
+MSG_PROTOCOL_STEP   = 0x0132
+MSG_LOG_ENTRY_2         = 0x0012
 MSG_LOG_ENTRY           = 0x0013
 MSG_SUBSYS_STATUS       = 0x002F
 MSG_SUBSYS_QUERY        = 0x0030
@@ -230,7 +248,7 @@ MSG_NAMES = {
     0x0046: "Calibration",     0x00C9: "StartRun",
     0x012D: "CreateExperiment",0x012E: "FinalizeExpt",
     0x012F: "DefineProgram",   0x0130: "FinalizeProgram",
-    0x0131: "StepParameters",  0x0132: "AcquisitionPt",
+    0x0131: "ThermalParams",  0x0132: "ProtocolStep",
     0x044D: "GetResultData",   0x044E: "AckResult",
     0x044F: "QueryResultInfo", 0x047F: "QueryLoadState",
     0x04B0: "SetParameter",
@@ -259,8 +277,8 @@ _MSG_PORT = {
     MSG_FINALIZE_EXPERIMENT: PORT_COMMANDS,
     MSG_DEFINE_PROGRAM:      PORT_COMMANDS,
     MSG_FINALIZE_PROGRAM:    PORT_COMMANDS,
-    MSG_STEP_PARAMETERS:     PORT_COMMANDS,
-    MSG_ACQUISITION_POINT:   PORT_COMMANDS,
+    MSG_THERMAL_PARAMS:     PORT_COMMANDS,
+    MSG_PROTOCOL_STEP:   PORT_COMMANDS,
     # Results + load state
     MSG_GET_RESULT_DATA:     PORT_RESULTS,
     MSG_ACK_RESULT:          PORT_RESULTS,
@@ -655,7 +673,7 @@ class LightCyclerConnection:
             if len(fields) > 3:
                 log.debug("Trace: %s", fields[3][:80])
 
-        elif pkt.msg_type in (MSG_SYS_INFO, MSG_CTRL_INFO, MSG_LOG_ENTRY):
+        elif pkt.msg_type in (MSG_SYS_INFO, MSG_CTRL_INFO, MSG_LOG_ENTRY, MSG_LOG_ENTRY_2):
             # Logs on port 5101 - ACK with seq number
             seq = fields[0] if fields else ''
             self._send_on(port,
